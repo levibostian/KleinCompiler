@@ -16,9 +16,7 @@
 (define line-reader
   (lambda (current-code-line input-port)
     ; send line of code to function that reads character by character
-    (char-reader 
-   ; (line-reader (line-read input-port) input-port)
-    )))
+    ))
 
 ;(define char-reader
 ;  (lambda (char accum-string)
@@ -41,4 +39,4 @@
                (eq? accum ":")
                (eq? accum ",")) (string-append "<punctuation> " accum))
           (else (string-append "<identifier> " accum))) ))
-           
+

@@ -1,0 +1,111 @@
+// Andrew Howard
+
+main( x:integer ):integer
+  circularPrimesTo(x)
+
+circularPrimesTo(x:integer):integer
+  circularPrimesToHelper(x+1, 2, 0)
+
+circularPrimesToHelper(top:integer, x:integer, count:integer):integer
+  if x<top then
+    if isCircularPrime(x) then
+      circularPrimesToHelper(top, x+1, count+1)
+    else
+      circularPrimesToHelper(top, x+1, count)
+    endif
+  else
+    count
+  endif
+
+isCircularPrime(x:integer):boolean
+  if isCircularPrimeHelper( x, log10(x)+1 ) then
+    report(x)
+  else
+    false
+  endif
+
+isCircularPrimeHelper(x:integer, turns:integer):boolean
+  if turns=0 then
+    true
+  else
+    and (
+      isPrime(x),
+      isCircularPrimeHelper( rotate(x), turns-1 )
+    )//End and()
+  endif
+
+report(x:integer):boolean
+  print(x)
+  true
+
+and(x:boolean, y:boolean):boolean
+  if x then
+    y
+  else
+    false
+  endif
+
+rotate(x:integer):integer
+  add (
+    x/10,
+    mod(x,10) * pow (
+                  10,
+                  log10(x)
+                )//End pow()
+  )//End add()
+
+pow(x:integer,y:integer):integer
+  powHelper(x,y,x)
+
+powHelper(base:integer, power:integer, total:integer):integer
+  if power=0 then
+    1
+  else
+    if power=1 then
+      total
+    else
+      powHelper(base,
+                power-1,
+                base*total)
+    endif
+  endif
+
+log10(x:integer):integer
+  log10Helper(x,0)
+
+log10Helper(x:integer, y:integer):integer
+  if div(x,10) = 0 then
+    y
+  else
+    log10Helper( x/10, y+1 )
+  endif
+
+
+// Primitive wrappers to affect Order of Operations
+add(x:integer,y:integer):integer
+  x+y
+
+div(x:integer,y:integer):integer
+  x/y
+
+
+// Code blatantly stolen from Sieve
+isPrime( n : integer ) : boolean
+  not hasDivisorFrom(2, n)
+
+hasDivisorFrom( i : integer, n : integer) : boolean
+  if i < n then
+    divides(i, n) or hasDivisorFrom(i+1, n)
+  else
+    false
+  endif
+
+divides( a : integer, b : integer) : boolean
+  mod(b, a) = 0
+
+mod( num : integer, den : integer) : integer
+  if num < den then
+    num
+  else
+    mod( num-den, den)
+  endif
