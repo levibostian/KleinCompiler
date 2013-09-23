@@ -4,12 +4,12 @@
 ; 
 ; Team RackAttack
 
-(provide klein
+(provide scanner
          line-reader
          char-reader
          token-factory)
 
-(define klein
+(define scanner
   (lambda (source-code-path)
     (line-reader "" (open-input-file source-code-path)) ))
 
