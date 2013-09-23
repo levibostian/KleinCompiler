@@ -1,0 +1,92 @@
+// Eugene Wallingford
+// October 21, 2010
+// http://www.cs.uni.edu/~wallingf/blog/
+//        archives/monthly/2010-10.html#e2010-10-25T16_50_29.htm
+
+main(xNum : integer, xDen : integer, N : integer) : integer
+    print( fareyNum(xNum, xDen, N) )
+    fareyDen(xNum, xDen, N)
+
+fareyNum(xNum : integer, xDen : integer, N : integer) : integer
+    fareySelectNum(N,
+                   whileLoopFor(1, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(2, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(3, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(4, xNum, xDen, N, 0, 1, 1, 1))
+
+fareyDen(xNum : integer, xDen : integer, N : integer) : integer
+    fareySelectDen(N,
+                   whileLoopFor(1, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(2, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(3, xNum, xDen, N, 0, 1, 1, 1),
+                   whileLoopFor(4, xNum, xDen, N, 0, 1, 1, 1))
+
+fareySelectNum(N : integer,
+               a : integer, b : integer, c : integer, d : integer)
+             : integer
+    if greater(b, N)
+       then c
+       else a
+    endif
+
+fareySelectDen(N : integer,
+               a : integer, b : integer, c : integer, d : integer)
+             : integer
+    if greater(b, N)
+       then d
+       else b
+    endif
+
+whileLoopFor(selector : integer,
+             xNum : integer, xDen : integer,
+             N : integer,
+             a : integer, b : integer, c : integer, d : integer)
+           : integer
+    if greater(b, N) or greater(d, N)
+       then if selector = 1
+               then a
+               else if selector = 2
+                       then b
+                       else if selector = 3
+                               then c
+                               else d
+                            endif
+                    endif
+            endif
+       else if fractionEqual(xNum, xDen, a+c, b+d)
+               then if selector = 1
+                       then a+c
+                       else if selector = 2
+                               then b+d
+                               else if selector = 3
+                                       then a+c
+                                       else b+d
+                                    endif
+                            endif
+                    endif
+               else if fractionGreater(xNum, xDen, a+c, b+d)
+                       then whileLoopFor(selector,
+                                         xNum, xDen,
+                                         N,
+                                         a+c, b+d, c, d)
+                       else whileLoopFor(selector,
+                                         xNum, xDen,
+                                         N,
+                                         a, b, a+c, b+d)
+                    endif
+            endif
+    endif
+
+fractionEqual(x : integer, xd : integer, y : integer, yd : integer)
+            : boolean
+    x * yd = y * xd
+
+fractionGreater(x : integer, xd : integer, y : integer, yd : integer)
+              : boolean
+    greater(x * yd, y * xd)
+
+greater(x : integer, y : integer) : boolean
+    if x < y or x = y
+       then false
+       else true
+    endif
