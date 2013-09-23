@@ -1,0 +1,2 @@
+# ignore .rkt~ files created by DrRacket
+*.rkt~ 
