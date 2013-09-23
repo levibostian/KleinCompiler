@@ -1,2 +1,3 @@
-# ignore .rkt~ files created by DrRacket
-*.rkt~ 
+# ignore files created by DrRacket
+*.rkt~
+ compiled/*
