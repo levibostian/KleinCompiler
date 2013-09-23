@@ -1,0 +1,25 @@
+// this program returns the nth fibonacci number
+//   or 0 if the parameter is invalid
+// based on a program by Jonathan Paisley and Matt Wemmie
+
+main ( elementWanted : integer ) : integer 
+
+  if elementWanted < 1 then
+     0
+  else
+     addNext(1, elementWanted, 0, 1)
+  endif
+
+addNext(currentElement : integer,
+        elementWanted  : integer,
+        previousSum    : integer,
+        currentSum     : integer  ) : integer 
+
+if elementWanted = currentNumber then
+   currentSum
+else
+   addNext( currentNumber + 1,
+            elementWanted,
+            currentSum,
+            previousSum + currentSum )
+endif
