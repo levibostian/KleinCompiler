@@ -8,17 +8,34 @@
          file-reader
          file-reader-helper
          line-reader
-         next-char
+         rest-of
          member?
          punctuation?
          whitespace?
          operator?
-         token-factory)
+         token-factory
+         check-for/add-tokens
+         reset/accum-chars)
 
 (define empty-char-accum "")
-(define operators-list (list "+" "-" "/" "*" "<" ">" "="))
-(define punctuations-list (list "(" ")" ":" ","))
-(define whitespaces-list (list " "))
+(define operators   (list "+" "-" "/" "*" "<" ">" "="))
+(define punctuation (list "(" ")" ":" ","))
+(define whitespace  (list " "));needs to be expanded, I think. Maybe not?
+
+(define member? (lambda (item lyst) (if (member item lyst) #t #f)))
+
+(define punctuation? 
+  (lambda (char)
+    (member? char punctuation) ))
+
+(define whitespace?
+  (lambda (char)
+    (member? char whitespace) ))
+
+(define operator?
+  (lambda (char)
+    (member? char operators) ))
+
 
 (define scanner
   (lambda (source-code-path)
@@ -38,50 +55,37 @@
                  (line-reader next-line-code token-list empty-char-accum)))
             (file-reader-helper port token-result)))) ))
 
-(define line-reader
+(define line-reader;do these lines include \n characters?
   (lambda (line token-accum char-accum)
-    (let ((current-char (string-ref line 0)))
-      (cond (punctuation? current-char)
-              (line-reader (next-char line) (punctuation-token-construct current-char char-accum token-accum) empty-char-accum)
-            (whitespace? current-char)
-              (line-reader (next-char line) (whitespace-token-construct char-accum token-accum) empty-char-accum)
-            (operator? current-char)
-              (line-reader (next-char line) (operator-token-construct current-char char-accum token-accum) empty-char-accum)
-            (else ;char, so add to accum
-              (line-reader (next-char line) (string-append char-accum current-char)))))))
+    (let ((current-char (substring line 0 1))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
+      (line-reader (rest-of line)
+                   (check-for/add-tokens current-char token-accum char-accum)
+                   (reset/accum-chars current-char char-accum)
+                   ))))
 
-(define whitespace-token-construct
+(define check-for/add-tokens
+  (lambda (current-char tokens chars)
+    (cond ((or (punctuation? current-char);this will be cleaned up
+               (operator?    current-char)) (cons (token-factory current-char) (cons (token-factory chars) tokens)))
+          ((whitespace?  current-char) (whitespace->token chars tokens))
+          (else tokens) )))
+
+(define reset/accum-chars
+  (lambda (current-char chars)
+    (if (or (punctuation? current-char)
+            (operator?    current-char)
+            (whitespace?  current-char))
+        ""
+        chars)))
+
+(define whitespace->token
   (lambda (char-accum token-accum)
     (cons (token-factory char-accum) token-accum) ))
 
-(define punctuation-token-construct
-  (lambda (punctuation-char char-accum token-accum)
-    (cons (token-factory punctuation-char) (cons (token-factory char-accum) token-accum)) ))
-
-(define operator-token-construct
-  (lambda (operator-char char-accum token-accum)
-    (cons (token-factory operator-char) (cons (token-factory char-accum) token-accum)) ))
-
-(define next-char
+(define rest-of
   (lambda (line)
     (substring line 1) ))
                            
-(define member?
-  (lambda (item lyst)
-    (or (member lyst item)) ))
-
-(define punctuation? 
-  (lambda (char)
-    (member? char punctuations-list) ))
-
-(define whitespace?
-  (lambda (char)
-    (member? char whitespaces-list) ))
-
-(define operator?
-  (lambda (char)
-    (member? char operators-list) ))
-
 (define token-factory
   (lambda (accum)
     (cond ((or (eq? accum "integer")
