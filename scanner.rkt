@@ -61,17 +61,17 @@
 
 (define line-reader;do these lines include \n characters?
   (lambda (line token-accum char-accum)
-    (let ((current-char (get-current-char line))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
-      (line-reader (rest-of line)
-                   (check-for/add-tokens current-char token-accum char-accum)
-                   (reset/accum-chars current-char char-accum)
-                   ))))
+    (if (end-of-line? line)
+        token-accum
+        (let ((current-char (get-next-char line))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
+          (line-reader (rest-of line)
+                       (check-for/add-tokens current-char token-accum char-accum)
+                       (reset/accum-chars current-char char-accum)
+                       ))) ))
 
-(define get-current-char
+(define get-next-char
   (lambda (code-line)
-    (if (end-of-line? code-line)
-        ""
-        (substring code-line 0 1)) ))
+    (substring code-line 0 1) ))
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
@@ -99,13 +99,12 @@
                            
 (define token-factory
   (lambda (char-or-accum)
-    (cond ((or (eq? accum "integer")
-               (eq? accum "boolean")) (string-append "<type> " accum))
-          ((or (eq? accum "(")
-               (eq? accum ")")
-               (eq? accum ":")
-               (eq? accum ",")) (string-append "<punctuation> " accum))
-          (else (string-append "<identifier> " accum))) ))
-
+    (cond ((or (eq? char-or-accum "integer")
+               (eq? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
+          ((or (eq? char-or-accum "(")
+               (eq? char-or-accum ")")
+               (eq? char-or-accum ":")
+               (eq? char-or-accum ",")) (string-append "<punctuation> " char-or-accum))
+          (else (string-append "<identifier> " char-or-accum))) ))
 
 (scanner "klein-programs/euclid.kln")
