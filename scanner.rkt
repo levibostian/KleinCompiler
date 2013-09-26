@@ -32,6 +32,10 @@
   (lambda (char)
     (member? char whitespace) ))
 
+(define end-of-line?
+  (lambda (char)
+    (eq? (string-length char) 0) ));did not make member? because this is ONLY option.
+
 (define operator?
   (lambda (char)
     (member? char operators) ))
@@ -57,17 +61,24 @@
 
 (define line-reader;do these lines include \n characters?
   (lambda (line token-accum char-accum)
-    (let ((current-char (substring line 0 1))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
+    (let ((current-char (get-current-char line))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
       (line-reader (rest-of line)
                    (check-for/add-tokens current-char token-accum char-accum)
                    (reset/accum-chars current-char char-accum)
                    ))))
+
+(define get-current-char
+  (lambda (code-line)
+    (if (end-of-line? code-line)
+        ""
+        (substring code-line 0 1)) ))
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
     (cond ((or (punctuation? current-char);this will be cleaned up
                (operator?    current-char)) (cons (token-factory current-char) (cons (token-factory chars) tokens)))
           ((whitespace?  current-char) (whitespace->token chars tokens))
+          ((end-of-line? current-char) (whitespace->token chars tokens))
           (else tokens) )))
 
 (define reset/accum-chars
