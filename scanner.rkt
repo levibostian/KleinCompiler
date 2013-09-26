@@ -76,10 +76,16 @@
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
     (cond ((or (punctuation? current-char);this will be cleaned up
-               (operator?    current-char)) (cons (token-factory current-char) (cons (token-factory chars) tokens)))
+               (operator?    current-char)) (add-to-token-accum current-char tokens chars))
           ((whitespace?  current-char) (whitespace->token chars tokens))
           ((end-of-line? current-char) (whitespace->token chars tokens))
           (else tokens) )))
+
+(define add-to-token-accum
+  (lambda (char tokens-list char-accum)
+    (if (> (string-length char-accum) 0)
+        (cons (token-factory char) (cons (token-factory char-accum) tokens-list))
+        (cons (token-factory char) tokens-list)) ))
 
 (define reset/accum-chars
   (lambda (current-char chars)
@@ -91,7 +97,9 @@
 
 (define whitespace->token
   (lambda (char-accum token-accum)
-    (cons (token-factory char-accum) token-accum) ))
+    (if (> (string-length char-accum) 0)
+        (cons (token-factory char-accum) token-accum)
+        token-accum) ))
 
 (define rest-of
   (lambda (line)
