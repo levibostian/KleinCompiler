@@ -40,6 +40,24 @@
   (lambda (char)
     (member? char operators) ))
 
+(define get-next-char
+  (lambda (code-line)
+    (substring code-line 0 1) ))
+
+(define char-only-has-value
+  (lambda (char char-accum)
+    (and (= (string-length char) 0)
+                (> (string-length char) 0)) ))
+
+(define char-accum-only-has-value
+  (lambda (char char-accum)
+    (and (> (string-length char-accum) 0)
+                (= (string-length char) 0)) ))
+
+(define both-accums-have-values
+  (lambda (char char-accum)
+    (and (> (string-length char-accum) 0)
+                (> (string-length char) 0)) ))
 
 (define scanner
   (lambda (source-code-path)
@@ -59,33 +77,30 @@
                  (line-reader next-line-code token-list empty-char-accum)))
             (file-reader-helper port token-result)))) ))
 
-(define line-reader;do these lines include \n characters?
+(define line-reader
   (lambda (line token-accum char-accum)
     (if (end-of-line? line)
-        token-accum
-        (let ((current-char (get-next-char line))) ;this was changed so that it grabs a String instead of a Char. Will make it easier
+        (add-to-token-accum line token-accum char-accum)
+        (let ((current-char (get-next-char line)))
           (line-reader (rest-of line)
                        (check-for/add-tokens current-char token-accum char-accum)
                        (reset/accum-chars current-char char-accum)
                        ))) ))
-
-(define get-next-char
-  (lambda (code-line)
-    (substring code-line 0 1) ))
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
     (cond ((or (punctuation? current-char);this will be cleaned up
                (operator?    current-char)) (add-to-token-accum current-char tokens chars))
           ((whitespace?  current-char) (whitespace->token chars tokens))
-          ((end-of-line? current-char) (whitespace->token chars tokens))
           (else tokens) )))
 
 (define add-to-token-accum
   (lambda (char tokens-list char-accum)
-    (if (> (string-length char-accum) 0)
-        (cons (token-factory char) (cons (token-factory char-accum) tokens-list))
-        (cons (token-factory char) tokens-list)) ))
+    (cond ((both-accums-have-values char char-accum) (cons (token-factory char) (cons (token-factory char-accum) tokens-list)))
+          ((char-accum-only-has-value char char-accum) (cons (token-factory char-accum) tokens-list))
+          ((char-only-has-value char char-accum) (cons (token-factory char) tokens-list))
+          (else 
+           tokens-list)) ))
 
 (define reset/accum-chars
   (lambda (current-char chars)
