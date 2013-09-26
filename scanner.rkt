@@ -87,7 +87,7 @@
     (substring line 1) ))
                            
 (define token-factory
-  (lambda (accum)
+  (lambda (char-or-accum)
     (cond ((or (eq? accum "integer")
                (eq? accum "boolean")) (string-append "<type> " accum))
           ((or (eq? accum "(")
@@ -95,3 +95,6 @@
                (eq? accum ":")
                (eq? accum ",")) (string-append "<punctuation> " accum))
           (else (string-append "<identifier> " accum))) ))
+
+
+(scanner "klein-programs/euclid.kln")
