@@ -66,26 +66,27 @@
 
 (define file-reader
   (lambda (port)
-    (file-reader-helper port '()) ))
+    (file-reader-helper port '() 0) ))
 
 (define file-reader-helper
-  (lambda (port token-list)
+  (lambda (port token-list row-in-file)
     (let ((next-line-code (read-line port)))
       (if (eof-object? next-line-code)
           token-list
           (let ((token-result 
                  (line-reader next-line-code token-list empty-char-accum)))
-            (file-reader-helper port token-result)))) ))
+            (file-reader-helper port token-result (+ 1 row-in-file))))) ))
 
 (define line-reader
-  (lambda (line token-accum char-accum)
+  (lambda (line token-accum char-accum row-in-file column-in-file)
     (if (end-of-line? line)
         (add-to-token-accum line token-accum char-accum)
         (let ((current-char (get-next-char line)))
           (line-reader (rest-of line)
                        (check-for/add-tokens current-char token-accum char-accum)
                        (reset/accum-chars current-char char-accum)
-                       ))) ))
+                       row-in-file
+                       (+ 1 column-in-file)))) ))
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
