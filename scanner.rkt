@@ -122,12 +122,12 @@
 
 (define token-factory
   (lambda (char-or-accum)
-    (cond ((or (eq? char-or-accum "integer")
-               (eq? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
-          ((or (eq? char-or-accum "(")
-               (eq? char-or-accum ")")
-               (eq? char-or-accum ":")
-               (eq? char-or-accum ",")) (string-append "<punctuation> " char-or-accum))
+    (cond ((or (equal? char-or-accum "integer")
+               (equal? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
+          ((or (equal? char-or-accum "(")
+               (equal? char-or-accum ")")
+               (equal? char-or-accum ":")
+               (equal? char-or-accum ",")) (string-append "<punctuation> " char-or-accum))
           (else (string-append "<identifier> " char-or-accum))) ))
 
 (scanner "klein-programs/euclid.kln")
