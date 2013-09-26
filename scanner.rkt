@@ -13,11 +13,11 @@
          punctuation?
          whitespace?
          operator?
-         token-factory
+         generate-token
          check-for/add-tokens
          reset/accum-chars)
 
-(define empty-char-accum "")
+(define empty-char "")
 (define operators   (list "+" "-" "/" "*" "<" ">" "="))
 (define punctuation (list "(" ")" ":" ","))
 (define whitespace  (list " "));needs to be expanded, I think. Maybe not?
@@ -44,21 +44,6 @@
   (lambda (code-line)
     (substring code-line 0 1) ))
 
-(define char-only-has-value
-  (lambda (char char-accum)
-    (and (= (string-length char-accum) 0)
-         (> (string-length char) 0)) ))
-
-(define char-accum-only-has-value
-  (lambda (char char-accum)
-    (and (> (string-length char-accum) 0)
-         (= (string-length char) 0)) ))
-
-(define both-accums-have-values
-  (lambda (char char-accum)
-    (and (> (string-length char-accum) 0)
-         (> (string-length char) 0)) ))
-
 (define scanner
   (lambda (source-code-path)
     (let ((port (open-input-file source-code-path)))
@@ -74,13 +59,13 @@
       (if (eof-object? next-line-code)
           token-list
           (let ((token-result 
-                 (line-reader next-line-code token-list empty-char-accum)))
+                 (line-reader next-line-code token-list empty-char row-in-file 0)))
             (file-reader-helper port token-result (+ 1 row-in-file))))) ))
 
 (define line-reader
   (lambda (line token-accum char-accum row-in-file column-in-file)
     (if (end-of-line? line)
-        (add-to-token-accum line token-accum char-accum)
+        (add-chars-token char-accum token-accum)
         (let ((current-char (get-next-char line)))
           (line-reader (rest-of line)
                        (check-for/add-tokens current-char token-accum char-accum)
@@ -90,18 +75,19 @@
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
-    (cond ((or (punctuation? current-char);this will be cleaned up
-               (operator?    current-char)) (add-to-token-accum current-char tokens chars))
+    (cond ((or (punctuation? current-char)
+               (operator?    current-char)) (combine-tokens (generate-token current-char) 
+                                                            (add-chars-token chars tokens)))
           ((whitespace?  current-char) (whitespace->token chars tokens))
           (else tokens) )))
 
-(define add-to-token-accum
-  (lambda (char tokens-list char-accum)
-    (cond ((both-accums-have-values char char-accum) (cons (token-factory char) (cons (token-factory char-accum) tokens-list)))
-          ((char-accum-only-has-value char char-accum) (cons (token-factory char-accum) tokens-list))
-          ((char-only-has-value char char-accum) (cons (token-factory char) tokens-list))
-          (else 
-           tokens-list)) ))
+(define combine-tokens cons)
+
+(define add-chars-token
+  (lambda (chars tokens)
+    (if (eq? chars "")
+        tokens
+        (cons (generate-token chars) tokens))))
 
 (define reset/accum-chars
   (lambda (current-char chars)
@@ -114,14 +100,18 @@
 (define whitespace->token
   (lambda (char-accum token-accum)
     (if (> (string-length char-accum) 0)
-        (cons (token-factory char-accum) token-accum)
+        (combine-tokens (generate-token char-accum) token-accum)
         token-accum) ))
 
 (define rest-of
   (lambda (line)
     (substring line 1) ))
 
-(define token-factory
+;(define add-row/column 
+;  (lambda (token-value row column)
+;    ;finish this
+
+(define generate-token
   (lambda (char-or-accum)
     (cond ((or (equal? char-or-accum "integer")
                (equal? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
