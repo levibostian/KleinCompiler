@@ -46,7 +46,7 @@
 
 (define char-only-has-value
   (lambda (char char-accum)
-    (and (= (string-length char) 0)
+    (and (= (string-length char-accum) 0)
          (> (string-length char) 0)) ))
 
 (define char-accum-only-has-value
