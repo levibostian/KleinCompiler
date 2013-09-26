@@ -47,17 +47,17 @@
 (define char-only-has-value
   (lambda (char char-accum)
     (and (= (string-length char) 0)
-                (> (string-length char) 0)) ))
+         (> (string-length char) 0)) ))
 
 (define char-accum-only-has-value
   (lambda (char char-accum)
     (and (> (string-length char-accum) 0)
-                (= (string-length char) 0)) ))
+         (= (string-length char) 0)) ))
 
 (define both-accums-have-values
   (lambda (char char-accum)
     (and (> (string-length char-accum) 0)
-                (> (string-length char) 0)) ))
+         (> (string-length char) 0)) ))
 
 (define scanner
   (lambda (source-code-path)
@@ -119,7 +119,7 @@
 (define rest-of
   (lambda (line)
     (substring line 1) ))
-                           
+
 (define token-factory
   (lambda (char-or-accum)
     (cond ((or (eq? char-or-accum "integer")
