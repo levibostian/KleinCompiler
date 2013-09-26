@@ -87,7 +87,7 @@
             (operator?    current-char)
             (whitespace?  current-char))
         ""
-        chars)))
+        (string-append chars current-char)) ))
 
 (define whitespace->token
   (lambda (char-accum token-accum)
