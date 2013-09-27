@@ -22,3 +22,10 @@
 5. Once the entire source file has been traversed, return 
    the list to the user. 
 
+/// Scanner Execution:
+***Must have racket language installed to execute scanner.
+   And /bin/racket must also be located in $PATH variable.
+$ scanner <path-to-klein-source>
+
+<path-to-klein-source> example: "/klein-programs/euclid.kln"
+
