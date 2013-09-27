@@ -1,0 +1,8 @@
+main ( n : integer ) : boolean
+	factorial(n)
+
+factorial( n : integer) : integer
+	if n = 1 then
+		1
+	else
+		(n * factorial(n - 1))
