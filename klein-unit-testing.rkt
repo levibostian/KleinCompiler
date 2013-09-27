@@ -66,7 +66,7 @@
 (check-false (operator? "A"))
 ;
 ;these tests should be expanded
-(check-equal? (reset/accum-chars "(" "main") "")
+(check-equal? (reset-or-accum-chars "(" "main") "")
 (check-equal? (check-for/add-tokens "*" '() "main") '("<operator> *" "<keyword> main"));;this is depended on token
 ;factory and it is not working yet
 (check-equal? (check-for/add-tokens "}" '() "main") '())
