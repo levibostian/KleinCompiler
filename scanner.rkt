@@ -10,6 +10,8 @@
          line-reader
          rest-of
          member?
+         num?
+         keyword?
          separator?
          punctuation?
          whitespace?
@@ -41,7 +43,7 @@
         (member? item boolean-connective)
         (member? item primitive))))
 
-(define number?
+(define num? ;number? already taken by racket lang
   (lambda (num)
     (integer? (string->number num)) ))
 
