@@ -65,6 +65,13 @@
   (lambda (char)
     (eq? (string-length char) 0) ));did not make member? because this is ONLY option.
 
+(define stopping-char?
+  (lambda (char)
+    (or (punctuation? char)
+        (separator?   char)
+        (operator?    char)
+        (whitespace?  char) )))
+
 (define get-next-char
   (lambda (code-line)
     (substring code-line 0 1) ))
@@ -100,12 +107,16 @@
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
-    (cond ((or (punctuation? current-char)
-               (operator?    current-char)) (combine-tokens (generate-token current-char) 
-                                                            (add-chars-token chars tokens)))
-          ((whitespace?  current-char) (whitespace->token chars tokens))
+    (cond ((stopping-char? current-char) (tokens-additions current-char tokens chars))
           (else tokens) )))
 
+(define tokens-additions 
+  (lambda (current-char tokens chars)
+    (if (whitespace? current-char)
+        (whitespace->token chars tokens)
+        (combine-tokens (generate-token current-char) 
+                        (add-chars-token chars tokens)) )))
+        
 (define combine-tokens cons)
 
 (define add-chars-token
@@ -116,9 +127,7 @@
 
 (define reset/accum-chars
   (lambda (current-char chars)
-    (if (or (punctuation? current-char)
-            (operator?    current-char)
-            (whitespace?  current-char))
+    (if (stopping-char? current-char)
         ""
         (string-append chars current-char)) ))
 
