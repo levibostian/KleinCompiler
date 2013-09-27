@@ -52,14 +52,12 @@
         (member? item boolean-connective)
         (member? item primitive))))
 
-
-(define num? (lambda (num) (integer? (string->number num)) ))
-
 (define operator?
   (lambda (sym)
     (or (member? sym math-operator)
         (member? sym comparator)) ))
 
+(define num? (lambda (num) (integer? (string->number num)) ))
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
 (define separator?   (lambda (sym ) (member? sym separator) ))
 (define punctuation? (lambda (char) (member? char punctuation) ))
