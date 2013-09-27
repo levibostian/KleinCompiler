@@ -13,25 +13,27 @@
          punctuation?
          whitespace?
          operator?
+         comment?
+         keyword?
+         stopping-char?
+         separator?
          generate-token
          check-for/add-tokens
-         reset/accum-chars)
+         reset-or-accum-chars)
 
 (define empty-char "")
-(define operators   (list "+" "-" "/" "*" "<" "="))
-(define whitespace  (list " "))
-(define type (list "integer" "boolean"))
-(define boolean (list "true" "false"))
-(define math-operator (list "+" "-" "*" "/"))
-(define comparator (list "<" "="))
-(define separator (list "," ":"))
-(define punctuation (list "(" ")"))
-(define conditional (list "if" "then" "else" "endif"))
-(define primitive (list "main" "print"))
+(define operators          (list "+" "-" "/" "*" "<" "="))
+(define whitespace         (list " " "\r" "\n" "\r\n" "\t"))
+(define type               (list "integer" "boolean"))
+(define boolean            (list "true" "false"))
+(define math-operator      (list "+" "-" "*" "/"))
+(define comparator         (list "<" "="))
+(define separator          (list "," ":"))
+(define punctuation        (list "(" ")"))
+(define conditional        (list "if" "then" "else" "endif"))
+(define primitive          (list "main" "print"))
 (define boolean-connective (list "or" "and" "not"))
-(define comment (list "//"))
-
-(define member? (lambda (item lyst) (if (member item lyst) #t #f)))
+(define comment            (list "//"))
 
 (define comment?
   (lambda (line)
@@ -47,34 +49,58 @@
         (member? item boolean-connective)
         (member? item primitive))))
 
-(define number?
-  (lambda (num)
-    (integer? (string->number num)) ))
-
 (define operator?
   (lambda (sym)
     (or (member? sym math-operator)
         (member? sym comparator)) ))
 
-(define separator?
-  (lambda (sym)
-    (member? sym separator) ))
+(define member? (lambda (item lyst) (if (member item lyst) #t #f)))
+(define number?      (lambda (num) (integer? (string->number num)) ))
+(define separator?   (lambda (sym ) (member? sym separator) ))
+(define punctuation? (lambda (char) (member? char punctuation) ))
+(define whitespace?  (lambda (char) (member? char whitespace) ))
+(define end-of-line? (lambda (char) (eq? (string-length char) 0) ))
 
-(define punctuation? 
+(define stopping-char?
   (lambda (char)
-    (member? char punctuation) ))
+    (or (punctuation? char)
+        (separator?   char)
+        (operator?    char)
+        (whitespace?  char) )))
 
-(define whitespace?
-  (lambda (char)
-    (member? char whitespace) ))
+(define get-next-char (lambda (code-line) (substring code-line 0 1) ))
+(define rest-of (lambda (line) (substring line 1) ))
 
-(define end-of-line?
-  (lambda (char)
-    (eq? (string-length char) 0) ));did not make member? because this is ONLY option.
+(define combine-tokens cons)
 
-(define get-next-char
-  (lambda (code-line)
-    (substring code-line 0 1) ))
+(define check-for/add-tokens
+  (lambda (current-char tokens chars)
+    (cond ((stopping-char? current-char) (token-additions current-char tokens chars))
+          (else tokens) )))
+
+(define token-additions
+  (lambda (current-char tokens chars)
+    (if (whitespace? current-char)
+        (add-chars-token chars tokens)
+        (combine-tokens (generate-token current-char)
+                        (add-chars-token chars tokens)) )))
+
+(define add-chars-token
+  (lambda (chars tokens)
+    (if (eq? chars empty-char)
+        tokens
+        (combine-tokens (generate-token chars) tokens))))
+
+(define reset-or-accum-chars
+  (lambda (current-char chars)
+    (if (stopping-char? current-char)
+        empty-char
+        (string-append chars current-char)) ))
+
+
+(define run-scanner
+  (lambda (path-name)
+    (scanner path-name)))
 
 (define scanner
   (lambda (source-code-path)
@@ -102,56 +128,15 @@
            (let ((current-char (get-next-char line)))
              (line-reader (rest-of line)
                           (check-for/add-tokens current-char token-accum char-accum)
-                          (reset/accum-chars current-char char-accum)
+                          (reset-or-accum-chars current-char char-accum)
                           row-in-file
                           (+ 1 column-in-file))))) ))
 
-(define check-for/add-tokens
-  (lambda (current-char tokens chars)
-    (cond ((or (punctuation? current-char)
-               (operator?    current-char)
-               (separator?   current-char)) (combine-tokens (generate-token current-char) 
-                                                            (add-chars-token chars tokens)))
-          ((whitespace?  current-char) (whitespace->token chars tokens))
-          (else tokens) )))
-
-(define combine-tokens cons)
-
-(define add-chars-token
-  (lambda (chars tokens)
-    (if (eq? chars "")
-        tokens
-        (cons (generate-token chars) tokens))))
-
-(define reset/accum-chars
-  (lambda (current-char chars)
-    (if (or (punctuation? current-char)
-            (operator?    current-char)
-            (whitespace?  current-char))
-        ""
-        (string-append chars current-char)) ))
-
-(define whitespace->token
-  (lambda (char-accum token-accum)
-    (if (> (string-length char-accum) 0)
-        (combine-tokens (generate-token char-accum) token-accum)
-        token-accum) ))
-
-(define rest-of
-  (lambda (line)
-    (substring line 1) ))
-
-;(define add-row/column 
-;  (lambda (token-value row column)
-;    ;finish this
-
 (define generate-token
   (lambda (char-or-accum)
-    (cond ((keyword? char-or-accum) (string-append "<keyword> " char-or-accum))
-          ((number? char-or-accum) (string-append "<integer> " char-or-accum))
-          ((operator? char-or-accum) (string-append "<operator> " char-or-accum))
-          ((separator? char-or-accum) (string-append "<separator> " char-or-accum))
+    (cond ((keyword? char-or-accum)     (string-append "<keyword> "     char-or-accum))
+          ((number? char-or-accum)      (string-append "<integer> "     char-or-accum))
+          ((operator? char-or-accum)    (string-append "<operator> "    char-or-accum))
+          ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
           ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
           (else (string-append "<identifier> " char-or-accum))) ))
-
-(scanner "klein-programs/euclid.kln")
