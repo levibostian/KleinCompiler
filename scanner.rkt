@@ -33,6 +33,31 @@
 
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
 
+(define keyword?
+  (lambda (item)
+    (or (member? type)
+        (member? boolean)
+        (member? conditional)
+        (member? boolean-connective)
+        (member? primitive))))
+
+(define number?
+  (lambda (num)
+    (integer? (string->number num)) ))
+
+(define operator?
+  (lambda (sym)
+    (or (member? math-operator)
+        (member? comparator)) ))
+
+(define separator?
+  (lambda (sym)
+    (member? separator) ))
+
+(define punctuation?
+  (lambda (sym)
+    (member? separator) ))
+
 (define punctuation? 
   (lambda (char)
     (member? char punctuation) ))
@@ -122,8 +147,7 @@
 
 (define generate-token
   (lambda (char-or-accum)
-    (cond ((or (equal? char-or-accum "integer")
-               (equal? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
+    (cond (( (string-append "<type> " char-or-accum))
           ((or (equal? char-or-accum "(")
                (equal? char-or-accum ")")
                (equal? char-or-accum ":")
