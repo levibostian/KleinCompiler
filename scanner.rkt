@@ -18,18 +18,18 @@
          reset/accum-chars)
 
 (define empty-char "")
-(define operators   (list "+" "-" "/" "*" "<" "="))
-(define whitespace  (list " "))
-(define type (list "integer" "boolean"))
-(define boolean (list "true" "false"))
-(define math-operator (list "+" "-" "*" "/"))
-(define comparator (list "<" "="))
-(define separator (list "," ":"))
-(define punctuation (list "(" ")"))
-(define conditional (list "if" "then" "else" "endif"))
-(define primitive (list "main" "print"))
+(define operators          (list "+" "-" "/" "*" "<" "="))
+(define whitespace         (list " "))
+(define type               (list "integer" "boolean"))
+(define boolean            (list "true" "false"))
+(define math-operator      (list "+" "-" "*" "/"))
+(define comparator         (list "<" "="))
+(define separator          (list "," ":"))
+(define punctuation        (list "(" ")"))
+(define conditional        (list "if" "then" "else" "endif"))
+(define primitive          (list "main" "print"))
 (define boolean-connective (list "or" "and" "not"))
-(define comment (list "//"))
+(define comment            (list "//"))
 
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
 
@@ -70,7 +70,7 @@
 
 (define end-of-line?
   (lambda (char)
-    (eq? (string-length char) 0) ));did not make member? because this is ONLY option.
+    (eq? (string-length char) 0) ))
 
 (define stopping-char?
   (lambda (char)
@@ -118,10 +118,10 @@
     (cond ((stopping-char? current-char) (tokens-additions current-char tokens chars))
           (else tokens) )))
 
-(define tokens-additions 
+(define tokens-additions
   (lambda (current-char tokens chars)
     (if (whitespace? current-char)
-        (whitespace->token chars tokens)
+        (add-chars-token chars tokens)
         (combine-tokens (generate-token current-char) 
                         (add-chars-token chars tokens)) )))
         
@@ -136,29 +136,19 @@
 (define reset/accum-chars
   (lambda (current-char chars)
     (if (stopping-char? current-char)
-        ""
+        empty-char
         (string-append chars current-char)) ))
-
-(define whitespace->token
-  (lambda (char-accum token-accum)
-    (if (> (string-length char-accum) 0)
-        (combine-tokens (generate-token char-accum) token-accum)
-        token-accum) ))
 
 (define rest-of
   (lambda (line)
     (substring line 1) ))
 
-;(define add-row/column 
-;  (lambda (token-value row column)
-;    ;finish this
-
 (define generate-token
   (lambda (char-or-accum)
-    (cond ((keyword? char-or-accum) (string-append "<keyword> " char-or-accum))
-          ((number? char-or-accum) (string-append "<integer> " char-or-accum))
-          ((operator? char-or-accum) (string-append "<operator> " char-or-accum))
-          ((separator? char-or-accum) (string-append "<separator> " char-or-accum))
+    (cond ((keyword? char-or-accum)     (string-append "<keyword> "     char-or-accum))
+          ((number? char-or-accum)      (string-append "<integer> "     char-or-accum))
+          ((operator? char-or-accum)    (string-append "<operator> "    char-or-accum))
+          ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
           ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
           (else (string-append "<identifier> " char-or-accum))) ))
 
