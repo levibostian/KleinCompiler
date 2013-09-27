@@ -13,13 +13,17 @@
          punctuation?
          whitespace?
          operator?
+         comment?
+         keyword?
+         stopping-char?
+         separator?
          generate-token
          check-for/add-tokens
          reset-or-accum-chars)
 
 (define empty-char "")
 (define operators          (list "+" "-" "/" "*" "<" "="))
-(define whitespace         (list " "))
+(define whitespace         (list " " "\r" "\n" "\r\n" "\t"))
 (define type               (list "integer" "boolean"))
 (define boolean            (list "true" "false"))
 (define math-operator      (list "+" "-" "*" "/"))
@@ -78,7 +82,7 @@
   (lambda (current-char tokens chars)
     (if (whitespace? current-char)
         (add-chars-token chars tokens)
-        (combine-tokens (generate-token current-char) 
+        (combine-tokens (generate-token current-char)
                         (add-chars-token chars tokens)) )))
 
 (define add-chars-token
@@ -92,6 +96,11 @@
     (if (stopping-char? current-char)
         empty-char
         (string-append chars current-char)) ))
+
+
+(define run-scanner
+  (lambda (path-name)
+    (scanner path-name)))
 
 (define scanner
   (lambda (source-code-path)
@@ -131,5 +140,3 @@
           ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
           ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
           (else (string-append "<identifier> " char-or-accum))) ))
-
-(scanner "klein-programs/euclid.kln")
