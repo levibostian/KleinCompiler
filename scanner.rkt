@@ -29,8 +29,15 @@
 (define conditional (list "if" "then" "else" "endif"))
 (define primitive (list "main" "print"))
 (define boolean-connective (list "or" "and" "not"))
+(define comment (list "//"))
 
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
+
+(define comment?
+  (lambda (line)
+    (cond ((< (string-length line) 2) #f)
+          ((member? (substring line 0 2) comment) #t)
+          (else #f)) ))
 
 (define keyword?
   (lambda (item)
@@ -89,19 +96,21 @@
 
 (define line-reader
   (lambda (line token-accum char-accum row-in-file column-in-file)
-    (if (end-of-line? line)
-        (add-chars-token char-accum token-accum)
-        (let ((current-char (get-next-char line)))
-          (line-reader (rest-of line)
-                       (check-for/add-tokens current-char token-accum char-accum)
-                       (reset/accum-chars current-char char-accum)
-                       row-in-file
-                       (+ 1 column-in-file)))) ))
+    (cond ((end-of-line? line) (add-chars-token char-accum token-accum))
+          ((comment? line) token-accum)
+          (else 
+           (let ((current-char (get-next-char line)))
+             (line-reader (rest-of line)
+                          (check-for/add-tokens current-char token-accum char-accum)
+                          (reset/accum-chars current-char char-accum)
+                          row-in-file
+                          (+ 1 column-in-file))))) ))
 
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
     (cond ((or (punctuation? current-char)
-               (operator?    current-char)) (combine-tokens (generate-token current-char) 
+               (operator?    current-char)
+               (separator?   current-char)) (combine-tokens (generate-token current-char) 
                                                             (add-chars-token chars tokens)))
           ((whitespace?  current-char) (whitespace->token chars tokens))
           (else tokens) )))
