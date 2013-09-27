@@ -1,23 +1,23 @@
 main (g : integer, x : integer) : integer
-	sqrrootwithguess (g, x)
+    sqrrootwithguess (g, x)
 
 sqrrootwithguess (guess : integer, x : integer) : integer
-	if goodenough(guess, x) then
-		guess
-	else
-		sqrrootwithguess(improve(guess , x), x)
+    if goodenough(guess, x) then
+        guess
+    else
+        sqrrootwithguess(improve(guess , x), x)
 
 average (a : integer, b : integer) : integer
-	(a + b) / 2
+    (a + b) / 2
 
 improve (guess : integer, x : intger) : integer
-	average(guess, (x / guess))
+    average(guess, (x / guess))
 
 goodenough (guess : integer, x : integer) : boolean
-	abs((guess * guess) - x) < 1
+    abs((guess * guess) - x) < 1
 
 abs (int : integer) : integer
-	if int > 0 then
-		int
-	else
-		-int
+    if int > 0 then
+        int
+    else
+        -int
