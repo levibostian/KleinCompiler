@@ -18,11 +18,40 @@
          reset/accum-chars)
 
 (define empty-char "")
-(define operators   (list "+" "-" "/" "*" "<" ">" "="))
-(define punctuation (list "(" ")" ":" ","))
-(define whitespace  (list " "));needs to be expanded, I think. Maybe not?
+(define operators   (list "+" "-" "/" "*" "<" "="))
+(define whitespace  (list " "))
+(define type (list "integer" "boolean"))
+(define boolean (list "true" "false"))
+(define math-operator (list "+" "-" "*" "/"))
+(define comparator (list "<" "="))
+(define separator (list "," ":"))
+(define punctuation (list "(" ")"))
+(define conditional (list "if" "then" "else" "endif"))
+(define primitive (list "main" "print"))
+(define boolean-connective (list "or" "and" "not"))
 
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
+
+(define keyword?
+  (lambda (item)
+    (or (member? item type)
+        (member? item boolean)
+        (member? item conditional)
+        (member? item boolean-connective)
+        (member? item primitive))))
+
+(define number?
+  (lambda (num)
+    (integer? (string->number num)) ))
+
+(define operator?
+  (lambda (sym)
+    (or (member? sym math-operator)
+        (member? sym comparator)) ))
+
+(define separator?
+  (lambda (sym)
+    (member? sym separator) ))
 
 (define punctuation? 
   (lambda (char)
@@ -35,10 +64,6 @@
 (define end-of-line?
   (lambda (char)
     (eq? (string-length char) 0) ));did not make member? because this is ONLY option.
-
-(define operator?
-  (lambda (char)
-    (member? char operators) ))
 
 (define get-next-char
   (lambda (code-line)
@@ -113,12 +138,11 @@
 
 (define generate-token
   (lambda (char-or-accum)
-    (cond ((or (equal? char-or-accum "integer")
-               (equal? char-or-accum "boolean")) (string-append "<type> " char-or-accum))
-          ((or (equal? char-or-accum "(")
-               (equal? char-or-accum ")")
-               (equal? char-or-accum ":")
-               (equal? char-or-accum ",")) (string-append "<punctuation> " char-or-accum))
+    (cond ((keyword? char-or-accum) (string-append "<keyword> " char-or-accum))
+          ((number? char-or-accum) (string-append "<integer> " char-or-accum))
+          ((operator? char-or-accum) (string-append "<operator> " char-or-accum))
+          ((separator? char-or-accum) (string-append "<separator> " char-or-accum))
+          ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
           (else (string-append "<identifier> " char-or-accum))) ))
 
 (scanner "klein-programs/euclid.kln")
