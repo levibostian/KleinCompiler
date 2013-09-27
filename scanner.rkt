@@ -18,9 +18,18 @@
          reset/accum-chars)
 
 (define empty-char "")
-(define operators   (list "+" "-" "/" "*" "<" ">" "="))
+(define operators   (list "+" "-" "/" "*" "<" "="))
 (define punctuation (list "(" ")" ":" ","))
-(define whitespace  (list " "));needs to be expanded, I think. Maybe not?
+(define whitespace  (list " "))
+(define type (list "integer" "boolean"))
+(define boolean (list "true" "false"))
+(define math-operator (list "+" "-" "*" "/"))
+(define comparator (list "<" "="))
+(define separator (list "," ":"))
+(define punctuation (list "(" ")"))
+(define conditional (list "if" "then" "else" "endif"))
+(define primitive (list "main" "print"))
+(define boolean-connective (list "or" "and" "not"))
 
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
 
