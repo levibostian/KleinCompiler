@@ -10,6 +10,7 @@
          line-reader
          rest-of
          member?
+         separator?
          punctuation?
          whitespace?
          operator?
