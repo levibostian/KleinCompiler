@@ -52,17 +52,13 @@
         (member? item boolean-connective)
         (member? item primitive))))
 
-(define num? ;number? already taken by racket lang
-  (lambda (num)
-    (integer? (string->number num)) ))
-
 (define operator?
   (lambda (sym)
     (or (member? sym math-operator)
         (member? sym comparator)) ))
 
+(define num? (lambda (num) (integer? (string->number num)) ))
 (define member? (lambda (item lyst) (if (member item lyst) #t #f)))
-(define number?      (lambda (num) (integer? (string->number num)) ))
 (define separator?   (lambda (sym ) (member? sym separator) ))
 (define punctuation? (lambda (char) (member? char punctuation) ))
 (define whitespace?  (lambda (char) (member? char whitespace) ))
@@ -142,7 +138,7 @@
 (define generate-token
   (lambda (char-or-accum)
     (cond ((keyword? char-or-accum)     (string-append "<keyword> "     char-or-accum))
-          ((number? char-or-accum)      (string-append "<integer> "     char-or-accum))
+          ((num? char-or-accum)      (string-append "<integer> "     char-or-accum))
           ((operator? char-or-accum)    (string-append "<operator> "    char-or-accum))
           ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
           ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
