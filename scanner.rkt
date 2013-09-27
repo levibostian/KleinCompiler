@@ -140,7 +140,7 @@
 (define generate-token
   (lambda (char-or-accum)
     (cond ((keyword? char-or-accum)     (string-append "<keyword> "     char-or-accum))
-          ((number? char-or-accum)      (string-append "<integer> "     char-or-accum))
+          ((num? char-or-accum)      (string-append "<integer> "     char-or-accum))
           ((operator? char-or-accum)    (string-append "<operator> "    char-or-accum))
           ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
           ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
