@@ -40,7 +40,27 @@ If path-to-racket/bin/racket is not in your machine's $PATH
 environment variable, run the scanner with:
 $ <path-to-racket>/bin/racket scanner.rkt <path-to-klein-source>
 
+User may also load scanner.rkt source code file into DrRacket IDE
+,click "Run", then at prompt of DrRacket, enter:
+> (scanner <path-to-klein>)
+
 <path-to-racket> is path on your machine where racket language is
    installed. 
 <path-to-klein-source> example: "/klein-programs/euclid.kln"
 
+/// Files description:
+klnexamples/ 
+   contains example programs created by team in Klein
+klein-programs:
+   klein example programs pulled from Dr Wallingford
+klein-unit-testing.rkt
+   RackUnit unit tests created for scanner
+scanner
+   Bash shell script to execute scanner
+scanner.rkt
+   Klein scanner racket source file
+readme_scanner.txt
+   This file
+scanner-output-klein.rkt
+   expected output of example program files from Dr Wallingford
+   to run against unit tests for scanner
