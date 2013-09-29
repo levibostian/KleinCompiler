@@ -136,10 +136,14 @@
                           (+ 1 column-in-file))))) ))
 
 (define generate-token
-  (lambda (char-or-accum)
-    (cond ((keyword? char-or-accum)     (string-append "<keyword> "     char-or-accum))
-          ((num? char-or-accum)      (string-append "<integer> "     char-or-accum))
-          ((operator? char-or-accum)    (string-append "<operator> "    char-or-accum))
-          ((separator? char-or-accum)   (string-append "<separator> "   char-or-accum))
-          ((punctuation? char-or-accum) (string-append "<punctuation> " char-or-accum))
-          (else (string-append "<identifier> " char-or-accum))) ))
+  (lambda (char-or-accum column-num row-num)
+    (cond ((keyword? char-or-accum)     (build-token "<keyword>"     char-or-accum column-num row-num))
+          ((num? char-or-accum)         (build-token "<integer>"     char-or-accum column-num row-num))
+          ((operator? char-or-accum)    (build-token "<operator>"    char-or-accum column-num row-num))
+          ((separator? char-or-accum)   (build-token "<separator>"   char-or-accum column-num row-num))
+          ((punctuation? char-or-accum) (build-token "<punctuation>" char-or-accum column-num row-num))
+          (else (build-token "<identifier>" char-or-accum))) ))
+
+(define build-token
+  (lambda (token-name char-or-accum column-num row-num)
+    (string-append token-name " " char-or-accum " " column-num " " row-num) ))
