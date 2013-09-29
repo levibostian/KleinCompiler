@@ -4,25 +4,7 @@
 ; 
 ; Team RackAttack
 
-(provide scanner
-         file-reader
-         file-reader-helper
-         line-reader
-         rest-of
-         member?
-         num?
-         keyword?
-         separator?
-         punctuation?
-         whitespace?
-         operator?
-         comment?
-         keyword?
-         stopping-char?
-         separator?
-         generate-token
-         check-for/add-tokens
-         reset-or-accum-chars)
+(provide (all-defined-out))
 
 (define empty-char "")
 (define operators          (list "+" "-" "/" "*" "<" "="))

@@ -65,6 +65,9 @@
 (check-false (operator? "a"))
 (check-false (operator? "A"))
 
+(check-equal? (get-column-num "main" 4) 1)
+(check-equal? (get-column-num "integer" 7) 1) 
+
 (check-equal? (reset-or-accum-chars "(" "main") "")
 (check-equal? (check-for/add-tokens "*" '() "main") '("<operator> *" "<keyword> main"));;this is depended on token
 
