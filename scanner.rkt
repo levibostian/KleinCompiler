@@ -146,4 +146,8 @@
 
 (define build-token
   (lambda (token-name char-or-accum column-num row-num)
-    (string-append token-name " " char-or-accum " " (number->string column-num) " " (number->string row-num)) ))
+    (string-append token-name " " char-or-accum " " (get-column-num char-or-accum column-num) " " (number->string row-num)) ))
+
+(define get-column-num ;instead of column num being end of char-or-accum, make it beginning
+  (lambda (char-or-accum column-num)
+    (number->string (+ 1 (- column-num (string-length char-or-accum)))) ))
