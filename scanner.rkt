@@ -67,7 +67,7 @@
   (lambda (current-char tokens chars column-num row-num)
     (if (whitespace? current-char)
         (add-chars-token chars tokens column-num row-num)
-        (combine-tokens (generate-token current-char column-num row-num)
+        (combine-tokens (generate-token current-char (+ 1 column-num) row-num) ;increment for stopping-chars
                         (add-chars-token chars tokens column-num row-num)) )))
 
 (define add-chars-token
