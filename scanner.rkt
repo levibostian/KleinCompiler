@@ -59,18 +59,18 @@
 (define combine-tokens cons)
 
 (define check-for/add-tokens
-  (lambda (current-char tokens chars column-num row-num)
-    (cond ((stopping-char? current-char) (token-additions current-char tokens chars column-num row-num))
+  (lambda (current-char tokens char-accum column-num row-num)
+    (cond ((stopping-char? current-char) (token-additions current-char tokens char-accum column-num row-num))
           (else tokens) )))
 
 (define token-additions
-  (lambda (current-char tokens chars column-num row-num)
+  (lambda (current-char tokens char-accum column-num row-num)
     (if (whitespace? current-char)
-        (add-chars-token chars tokens column-num row-num)
-        (combine-tokens (generate-token current-char (+ 1 column-num) row-num) ;increment for stopping-chars
-                        (add-chars-token chars tokens column-num row-num)) )))
+        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)
+        (combine-tokens (generate-token current-char (get-column-num current-char column-num) row-num)
+                        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)) )))
 
-(define add-chars-token
+(define add-char-accum-to-token
   (lambda (chars tokens column-num row-num)
     (if (eq? chars empty-char)
         tokens
@@ -102,12 +102,12 @@
       (if (eof-object? next-line-code)
           token-list
           (let ((token-result 
-                 (line-reader next-line-code token-list empty-char 0 row-in-file)))
+                 (line-reader next-line-code token-list empty-char 1 row-in-file)))
             (file-reader-helper port token-result (+ 1 row-in-file))))) ))
 
 (define line-reader
   (lambda (line token-accum char-accum  column-in-file row-in-file)
-    (cond ((end-of-line? line) (add-chars-token char-accum token-accum column-in-file row-in-file))
+    (cond ((end-of-line? line) (add-char-accum-to-token char-accum token-accum (get-column-num char-accum column-in-file) row-in-file))
           ((comment? line) token-accum)
           (else 
            (let ((current-char (get-next-char line)))
@@ -128,8 +128,12 @@
 
 (define build-token
   (lambda (token-name char-or-accum column-num row-num)
-    (string-append token-name " " char-or-accum " " (get-column-num char-or-accum column-num) " " (number->string row-num)) ))
+    (string-append token-name " " char-or-accum " " column-num " " (number->string row-num)) ))
 
 (define get-column-num ;instead of column num being end of char-or-accum, make it beginning
   (lambda (char-or-accum column-num)
-    (number->string (+ 1 (- column-num (string-length char-or-accum)))) ))
+    (if (stopping-char? char-or-accum)
+        (number->string column-num)
+        (number->string (- column-num (string-length char-or-accum)))) ))
+
+(scanner "klein-programs/euclid.kln")
