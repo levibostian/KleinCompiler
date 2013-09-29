@@ -135,5 +135,3 @@
     (if (stopping-char? char-or-accum)
         (number->string column-num)
         (number->string (- column-num (string-length char-or-accum)))) ))
-
-(scanner "klein-programs/euclid.kln")
