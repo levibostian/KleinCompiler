@@ -3,32 +3,34 @@
             <PROGRAM> ::= <DEFINITIONS>
 
 --------------------------------------------------------------------------------
-
---CHANGED  <DEFINITIONS> ::= <DEF>
-                           | <DEF> <DEFINITIONS>
+      |                                         |
+      |  <DEFINITIONS> ::= <DEF>                |
+      |                  | <DEF> <DEFINITIONS>  |
+      |_________________________________________|
 
         <DEFINITIONS> ::= <DEF> <DEFINITIONS'>
 
-        <DEFINITIONS'> ::= <DEFINITIONS>
+        <DEFINITIONS'> ::= <DEF> <DEFINITIONS'>
                          | ε
 
 --------------------------------------------------------------------------------
 
-                <DEF> ::= <IDENTIFIER> ( <FORMALS> ) : <TYPE> <BODY>
+        <DEF> ::= <IDENTIFIER> ( <FORMALS> ) : <TYPE> <BODY>
 
 --------------------------------------------------------------------------------
 
-            <FORMALS> ::= ε
-                        | <NONEMPTYFORMALS>
+        <FORMALS> ::= ε
+                    | <NONEMPTYFORMALS>
 
 --------------------------------------------------------------------------------
-
---CHANGED  <NONEMPTYFORMALS> ::= <FORMAL>
-                               | <FORMAL> , <NONEMPTYFORMALS>
+  |                                                                    |
+  |  --CHANGED  <NONEMPTYFORMALS> ::= <FORMAL>                         |
+  |                                 | <FORMAL> , <NONEMPTYFORMALS>     |
+  |____________________________________________________________________|
 
     <NONEMPTYFORMALS> ::= <FORMAL> <NONEMPTYFORMALS'>
 
-    <NONEMPTYFORMALS'> ::= , <NONEMPTYFORMALS>
+    <NONEMPTYFORMALS'> ::= , <FORMAL> <NONEMPTYFORMALS'>
                          | ε
 
 --------------------------------------------------------------------------------
@@ -46,58 +48,58 @@
                         | boolean
 
 --------------------------------------------------------------------------------
+         |                                         |
+         |  <EXPR> ::= <EXPR> < <SIMPLE-EXPR>      | 
+         |           | <EXPR> = <SIMPLE-EXPR>      |
+         |           | <SIMPLE-EXPR>               |
+         |_________________________________________|
 
-    --CHANGED  <EXPR> ::= <EXPR> < <SIMPLE-EXPR>
-                        | <EXPR> = <SIMPLE-EXPR>
-                        | <SIMPLE-EXPR>
+           <EXPR> ::= <SIMPLE-EXPR> <EXPR'>
 
-            ========FINISH THIS========
-
-               <EXPR> ::= <SIMPLE-EXPR> <EXPR'>
-
-               <EXPR'> ::= < <EXPR>
-                         | = <EXPR>
-                         | ε
+           <EXPR'> ::= < <SIMPLE-EXPR> <EXPR'>
+                     | = <SIMPLE-EXPR> <EXPR'>
+                     | ε
 
 --------------------------------------------------------------------------------
-
---CHANGED  <SIMPLE-EXPR> ::= <SIMPLE-EXPR> or <TERM>
-                                 | <SIMPLE-EXPR> + <TERM>
-                                 | <SIMPLE-EXPR> - <TERM>
-                                 | - <TERM>
-                                 | <TERM>
-
+      |                                            |
+      | <SIMPLE-EXPR> ::= <SIMPLE-EXPR> or <TERM>  |
+      |                 | <SIMPLE-EXPR> + <TERM>   |
+      |                 | <SIMPLE-EXPR> - <TERM>   |
+      |                 | - <TERM>                 |
+      |                 | <TERM>                   |
+      |____________________________________________|
 
         <SIMPLE-EXPR> ::= <TERM> <SIMPLE-EXPR'>
-                        | - <TERM>
+                        | - <TERM> 
 
-        <SIMPLE-EXPR'> ::= or <SIMPLE-EXPR>    
-                         | + <SIMPLE-EXPR> 
-                         | - <SIMPLE-EXPR> 
+        <SIMPLE-EXPR'> ::= or <TERM> <SIMPLE-EXPR'>    
+                         | + <TERM> <SIMPLE-EXPR'> 
+                         | - <TERM> <SIMPLE-EXPR'> 
                          | ε
 
 --------------------------------------------------------------------------------
-
-    --CHANGED  <TERM> ::= <TERM> and <FACTOR>
-                                 | <TERM> * <FACTOR>
-                                 | <TERM> / <FACTOR>
-                                 | <FACTOR>
-
+           |                                    |
+           |   <TERM> ::= <TERM> and <FACTOR>   |
+           |           | <TERM> * <FACTOR>      |
+           |           | <TERM> / <FACTOR>      |
+           |           | <FACTOR>               |
+           |____________________________________|
 
                <TERM> ::= <FACTOR> <TERM'>
 
-               <TERM'> :: = and <TERM>
-                          | * <TERM>
-                          | / <TERM>
+               <TERM'> :: = and <FACTOR> <TERM'>
+                          | * <FACTOR> <TERM'>
+                          | / <FACTOR> <TERM'>
                           | ε
 
 --------------------------------------------------------------------------------
-
-  --CHANGED  <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif
-                                 | not <EXPR>
-                                 | <IDENTIFIER> ( <ACTUALS> )
-                                 | <IDENTIFIER>
-                                 | <LITERAL>
+          |                                                         |   
+          |  <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif   | 
+          |             | not <EXPR>                                |      
+          |             | <IDENTIFIER> ( <ACTUALS> )                |
+          |             | <IDENTIFIER>                              |
+          |             | <LITERAL>                                 |
+          |_________________________________________________________|
 
              <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif
                         | not <EXPR>
@@ -113,13 +115,14 @@
                         | <NONEMPTYACTUALS>
 
 --------------------------------------------------------------------------------
-
-   --CHANGED <NONEMPTYACTUALS> ::= <EXPR>
-                                 | <EXPR> , <NONEMPTYACTUALS>
+  |                                                    | 
+  |  <NONEMPTYACTUALS> ::= <EXPR>                      |
+  |                      | <EXPR> , <NONEMPTYACTUALS>  |
+  |____________________________________________________|                                                             
 
     <NONEMPTYACTUALS> ::= <EXPR> <NONEMPTYACTUALS'>
 
-    <NONEMPTYACTUALS'> ::= , <NONEMPTYACTUALS>
+    <NONEMPTYACTUALS'> ::= , <EXPR> <NONEMPTYACTUALS'>
                          | ε
 
 --------------------------------------------------------------------------------
