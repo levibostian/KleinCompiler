@@ -1,0 +1,132 @@
+--------------------------------------------------------------------------------
+
+            <PROGRAM> ::= <DEFINITIONS>
+
+--------------------------------------------------------------------------------
+
+--CHANGED  <DEFINITIONS> ::= <DEF>
+                           | <DEF> <DEFINITIONS>
+
+        <DEFINITIONS> ::= <DEF> <DEFINITIONS'>
+
+        <DEFINITIONS'> ::= <DEFINITIONS>
+            		     | ε
+
+--------------------------------------------------------------------------------
+
+                <DEF> ::= <IDENTIFIER> ( <FORMALS> ) : <TYPE> <BODY>
+
+--------------------------------------------------------------------------------
+
+            <FORMALS> ::= ε
+                        | <NONEMPTYFORMALS>
+
+--------------------------------------------------------------------------------
+
+--CHANGED  <NONEMPTYFORMALS> ::= <FORMAL>
+                               | <FORMAL> , <NONEMPTYFORMALS>
+
+    <NONEMPTYFORMALS> ::= <FORMAL> <NONEMPTYFORMALS'>
+
+    <NONEMPTYFORMALS'> ::= , <NONEMPTYFORMALS>
+            		     | ε
+
+--------------------------------------------------------------------------------
+
+             <FORMAL> ::= <IDENTIFIER> : <TYPE>
+
+--------------------------------------------------------------------------------
+
+               <BODY> ::= <PRINT> <BODY>
+                        | <EXPR>
+
+--------------------------------------------------------------------------------
+
+               <TYPE> ::= integer
+                        | boolean
+
+--------------------------------------------------------------------------------
+
+    --CHANGED  <EXPR> ::= <EXPR> < <SIMPLE-EXPR>
+                        | <EXPR> = <SIMPLE-EXPR>
+                        | <SIMPLE-EXPR>
+
+            ========FINISH THIS========
+
+               <EXPR> ::= <SIMPLE-EXPR> <EXPR'>
+
+               <EXPR'> ::= < <EXPR>
+                         | = <EXPR>
+        				 | ε
+
+--------------------------------------------------------------------------------
+
+--CHANGED  <SIMPLE-EXPR> ::= <SIMPLE-EXPR> or <TERM>
+                                 | <SIMPLE-EXPR> + <TERM>
+                                 | <SIMPLE-EXPR> - <TERM>
+                                 | - <TERM>
+                                 | <TERM>
+
+
+        <SIMPLE-EXPR> ::= <TERM> <SIMPLE-EXPR'>
+                        | - <TERM>
+
+        <SIMPLE-EXPR'> ::= or <SIMPLE-EXPR>    
+        				 | + <SIMPLE-EXPR> 
+        				 | - <SIMPLE-EXPR> 
+        				 | ε
+
+--------------------------------------------------------------------------------
+
+    --CHANGED  <TERM> ::= <TERM> and <FACTOR>
+                        		 | <TERM> * <FACTOR>
+                                 | <TERM> / <FACTOR>
+                                 | <FACTOR>
+
+
+               <TERM> ::= <FACTOR> <TERM'>
+
+               <TERM'> :: = and <TERM>
+                          | * <TERM>
+                          | / <TERM>
+             			  | ε
+
+--------------------------------------------------------------------------------
+
+  --CHANGED  <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif
+                                 | not <EXPR>
+                                 | <IDENTIFIER> ( <ACTUALS> )
+                                 | <IDENTIFIER>
+                                 | <LITERAL>
+
+             <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif
+                        | not <EXPR>
+                        | <IDENTIFIER> <FACTOR'>
+                        | <LITERAL>
+
+             <FACTOR'> ::= ( <ACTUALS> )
+             			 | ε
+
+--------------------------------------------------------------------------------
+
+            <ACTUALS> ::= ε
+                        | <NONEMPTYACTUALS>
+
+--------------------------------------------------------------------------------
+
+   --CHANGED <NONEMPTYACTUALS> ::= <EXPR>
+                                 | <EXPR> , <NONEMPTYACTUALS>
+
+    <NONEMPTYACTUALS> ::= <EXPR> <NONEMPTYACTUALS'>
+
+    <NONEMPTYACTUALS'> ::= , <NONEMPTYACTUALS>
+    					 | ε
+
+--------------------------------------------------------------------------------
+
+            <LITERAL> ::= <NUMBER>
+                        | <BOOLEAN>
+
+--------------------------------------------------------------------------------
+
+              <PRINT> ::= print ( <EXPR> )
