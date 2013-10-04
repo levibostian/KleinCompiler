@@ -1,3 +1,17 @@
+*------------------------------------------------------------------------------*
+*                 File: deterministric grammer.txt                             *
+*          Description: Refactoring Klein grammer to a deterministic state     *
+*                       -Definitions in box == original non-refactored form.   *
+*                       -Definitions below box == refactored form of boxed BNF.*
+*                       -Definitions without box == does not need refactoring. *
+*                 Team: RackAttack                                             *
+*                       Taylor Brown                                           *
+*                       Levi Bostian                                           *
+*                       Kyle Mueller                                           *
+*                 Term: cs4550 - Fall 2013                                     *
+*------------------------------------------------------------------------------*
+
+
 --------------------------------------------------------------------------------
 
             <PROGRAM> ::= <DEFINITIONS>
@@ -24,7 +38,7 @@
 
 --------------------------------------------------------------------------------
   |                                                                    |
-  |  --CHANGED  <NONEMPTYFORMALS> ::= <FORMAL>                         |
+  |             <NONEMPTYFORMALS> ::= <FORMAL>                         |
   |                                 | <FORMAL> , <NONEMPTYFORMALS>     |
   |____________________________________________________________________|
 
