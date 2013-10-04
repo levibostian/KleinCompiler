@@ -1,0 +1,149 @@
+*------------------------------------------------------------------------------*
+*                 File: deterministric grammer.txt                             *
+*          Description: Refactoring Klein grammer to a deterministic state     *
+*                       -Definitions in box == original non-refactored form.   *
+*                       -Definitions below box == refactored form of boxed BNF.*
+*                       -Definitions without box == does not need refactoring. *
+*                 Team: RackAttack                                             *
+*                       Taylor Brown                                           *
+*                       Levi Bostian                                           *
+*                       Kyle Mueller                                           *
+*                 Term: cs4550 - Fall 2013                                     *
+*------------------------------------------------------------------------------*
+
+
+--------------------------------------------------------------------------------
+
+            <PROGRAM> ::= <DEFINITIONS>
+
+--------------------------------------------------------------------------------
+      |                                         |
+      |  <DEFINITIONS> ::= <DEF>                |
+      |                  | <DEF> <DEFINITIONS>  |
+      |_________________________________________|
+
+        <DEFINITIONS> ::= <DEF> <DEFINITIONS'>
+
+        <DEFINITIONS'> ::= <DEF> <DEFINITIONS'>
+                         | ε
+
+--------------------------------------------------------------------------------
+
+        <DEF> ::= <IDENTIFIER> ( <FORMALS> ) : <TYPE> <BODY>
+
+--------------------------------------------------------------------------------
+
+        <FORMALS> ::= ε
+                    | <NONEMPTYFORMALS>
+
+--------------------------------------------------------------------------------
+  |                                                                    |
+  |             <NONEMPTYFORMALS> ::= <FORMAL>                         |
+  |                                 | <FORMAL> , <NONEMPTYFORMALS>     |
+  |____________________________________________________________________|
+
+    <NONEMPTYFORMALS> ::= <FORMAL> <NONEMPTYFORMALS'>
+
+    <NONEMPTYFORMALS'> ::= , <FORMAL> <NONEMPTYFORMALS'>
+                         | ε
+
+--------------------------------------------------------------------------------
+
+             <FORMAL> ::= <IDENTIFIER> : <TYPE>
+
+--------------------------------------------------------------------------------
+
+               <BODY> ::= <PRINT> <BODY>
+                        | <EXPR>
+
+--------------------------------------------------------------------------------
+
+               <TYPE> ::= integer
+                        | boolean
+
+--------------------------------------------------------------------------------
+         |                                         |
+         |  <EXPR> ::= <EXPR> < <SIMPLE-EXPR>      | 
+         |           | <EXPR> = <SIMPLE-EXPR>      |
+         |           | <SIMPLE-EXPR>               |
+         |_________________________________________|
+
+           <EXPR> ::= <SIMPLE-EXPR> <EXPR'>
+
+           <EXPR'> ::= < <SIMPLE-EXPR> <EXPR'>
+                     | = <SIMPLE-EXPR> <EXPR'>
+                     | ε
+
+--------------------------------------------------------------------------------
+      |                                            |
+      | <SIMPLE-EXPR> ::= <SIMPLE-EXPR> or <TERM>  |
+      |                 | <SIMPLE-EXPR> + <TERM>   |
+      |                 | <SIMPLE-EXPR> - <TERM>   |
+      |                 | - <TERM>                 |
+      |                 | <TERM>                   |
+      |____________________________________________|
+
+        <SIMPLE-EXPR> ::= <TERM> <SIMPLE-EXPR'>
+                        | - <TERM> 
+
+        <SIMPLE-EXPR'> ::= or <TERM> <SIMPLE-EXPR'>    
+                         | + <TERM> <SIMPLE-EXPR'> 
+                         | - <TERM> <SIMPLE-EXPR'> 
+                         | ε
+
+--------------------------------------------------------------------------------
+           |                                    |
+           |   <TERM> ::= <TERM> and <FACTOR>   |
+           |           | <TERM> * <FACTOR>      |
+           |           | <TERM> / <FACTOR>      |
+           |           | <FACTOR>               |
+           |____________________________________|
+
+               <TERM> ::= <FACTOR> <TERM'>
+
+               <TERM'> :: = and <FACTOR> <TERM'>
+                          | * <FACTOR> <TERM'>
+                          | / <FACTOR> <TERM'>
+                          | ε
+
+--------------------------------------------------------------------------------
+          |                                                         |   
+          |  <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif   | 
+          |             | not <EXPR>                                |      
+          |             | <IDENTIFIER> ( <ACTUALS> )                |
+          |             | <IDENTIFIER>                              |
+          |             | <LITERAL>                                 |
+          |_________________________________________________________|
+
+             <FACTOR> ::= if <EXPR> then <EXPR> else <EXPR> endif
+                        | not <EXPR>
+                        | <IDENTIFIER> <FACTOR'>
+                        | <LITERAL>
+
+             <FACTOR'> ::= ( <ACTUALS> )
+                         | ε
+
+--------------------------------------------------------------------------------
+
+            <ACTUALS> ::= ε
+                        | <NONEMPTYACTUALS>
+
+--------------------------------------------------------------------------------
+  |                                                    | 
+  |  <NONEMPTYACTUALS> ::= <EXPR>                      |
+  |                      | <EXPR> , <NONEMPTYACTUALS>  |
+  |____________________________________________________|                                                             
+
+    <NONEMPTYACTUALS> ::= <EXPR> <NONEMPTYACTUALS'>
+
+    <NONEMPTYACTUALS'> ::= , <EXPR> <NONEMPTYACTUALS'>
+                         | ε
+
+--------------------------------------------------------------------------------
+
+            <LITERAL> ::= <NUMBER>
+                        | <BOOLEAN>
+
+--------------------------------------------------------------------------------
+
+              <PRINT> ::= print ( <EXPR> )
