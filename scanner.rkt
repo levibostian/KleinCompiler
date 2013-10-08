@@ -81,6 +81,29 @@
     (if (stopping-char? current-char)
         empty-char
         (string-append chars current-char)) ))
+;stolen from Dr. Wallingford, session27 cs3540
+(define send                        ; or even "<-"
+  (lambda (object message . args)
+    (apply (look-up-method object message) args)))
+
+(define look-up-method
+  (lambda (object selector)
+    (object selector)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define scanner-stream
+  (lambda (scanner-output)
+    (lambda (operation)
+      (case operation
+        ('next
+          (lambda ()
+            (set! scanner-output (cdr scanner-output))
+            (car scanner-output) ))
+        ('peek
+          (lambda ()
+            (cadr scanner-output) ))
+        ('current
+          (lambda ()
+            (car scanner-output) ))))))
 
 
 (define run-scanner
