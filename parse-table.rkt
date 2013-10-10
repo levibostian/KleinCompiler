@@ -72,8 +72,8 @@
 (define defintions-cols (hash-copy terminal-columns))
 (hash-set! defintions-cols "identifier" '(def definitions-prime))
 ;
-(define definitions-prime (hash-copy terminal-columns))
-(hash-set*! definitions-prime "identifier" '(def defintions-prime) "$" '(epsilon))
+(define definitions-prime-cols (hash-copy terminal-columns))
+(hash-set*! definitions-prime-cols "identifier" '(def defintions-prime) "$" '(epsilon))
 ;
 (define def-cols (hash-copy terminal-columns))
 (hash-set! def-cols "identifier" '(identifier |(| formals |)| : type body))
@@ -81,26 +81,26 @@
 (define formals-cols (hash-copy terminal-columns))
 (hash-set*! formals-cols "identifier" '(nonemptyformals) ")" '(epsilon))
 ;
-(define nonemptyformals (hash-copy terminal-columns))
-(hash-set*! nonemptyformals "identifier" '(formal nonemptyformals-prime))
+(define nonemptyformals-cols (hash-copy terminal-columns))
+(hash-set*! nonemptyformals-cols "identifier" '(formal nonemptyformals-prime))
 ;
-(define nonemptyformals-prime (hash-copy terminal-columns))
-(hash-set*! nonemptyformals-prime "," '(|,| formal nonemptyformals-prime))
+(define nonemptyformals-prime-cols (hash-copy terminal-columns))
+(hash-set*! nonemptyformals-prime-cols "," '(|,| formal nonemptyformals-prime))
 ;
-(define formal (hash-copy terminal-columns))
-;(hash-set*! formal "identifier" '(identifier : type)) INCOMPLETE
+(define formal-cols (hash-copy terminal-columns))
+;(hash-set*! formal-cols "identifier" '(identifier : type)) INCOMPLETE
 ;
-(define body (hash-copy terminal-columns))
-(hash-set*! body "identifier" '(expr) "-" '(expr) "if" '(expr) "not" '(expr) "boolean" '(expr) "print" '(print body) )
+(define body-cols (hash-copy terminal-columns))
+(hash-set*! body-cols "identifier" '(expr) "-" '(expr) "if" '(expr) "not" '(expr) "boolean" '(expr) "print" '(print body) )
 ;
-(define type (hash-copy terminal-columns))
-(hash-set*! type "boolean" '(boolean) "integer" '(integer))
+(define type-cols (hash-copy terminal-columns))
+(hash-set*! type-cols "boolean" '(boolean) "integer" '(integer))
 ;
-(define expr (hash-copy terminal-columns))
-;(hash-set*! expr "expr" ;INCOMPLETE
+(define expr-cols (hash-copy terminal-columns))
+;(hash-set*! expr-cols "expr" ;INCOMPLETE
 ;
-(define expr-prime (hash-copy terminal-columns))
-(hash-set*! expr-prime "identifier" '(epsilon) 
+(define expr-prime-cols (hash-copy terminal-columns))
+(hash-set*! expr-prime-cols "identifier" '(epsilon) 
                        "+" '(epsilon) 
                        "-" '(epsilon) 
                        "*" '(epsilon) 
@@ -115,30 +115,30 @@
                        "else" '(epsilon) 
                        "endif" '(epsilon) 
                        "$" '(epsilon) )
-(define simple-expr (hash-copy terminal-columns))
-(hash-set*! simple-expr "identifier" '(term simple-expr-prime) 
+(define simple-expr-cols (hash-copy terminal-columns))
+(hash-set*! simple-expr-cols "identifier" '(term simple-expr-prime) 
                         "-" '(term simple-expr-prime)
                         "if" '(term simple-expr-prime)
                         "not" '(term simple-expr-prime)
                         "boolean" '(term simple-expr-prime)
                         "number" '(term simple-expr-prime))
 ;
-(define simple-expr-prime (hash-copy terminal-columns))
-(hash-set*! simple-expr-prime "+" '(+ term simple-expr-prime)
+(define simple-expr-prime-cols (hash-copy terminal-columns))
+(hash-set*! simple-expr-prime-cols "+" '(+ term simple-expr-prime)
                               "-" '(- term simple-expr-prime)
                               "=" '(epsilon) 
                               "<" '(epsilon) 
                               "or" '(or term simple-expr-prime))
 ;
-(define term (hash-copy terminal-columns))
-(hash-set*! term "identifer" '(factor term-prime)
+(define term-cols (hash-copy terminal-columns))
+(hash-set*! term-cols "identifer" '(factor term-prime)
                  "if" '(factor term-prime)
                  "not" '(factor term-prime)
                  "boolean" '(factor term-prime)
                  "number" '(factor term-prime))
 ;
-(define term-prime (hash-copy terminal-columns))
-(hash-set*! term-prime "+" '(epsilon) 
+(define term-prime-cols (hash-copy terminal-columns))
+(hash-set*! term-prime-cols "+" '(epsilon) 
                        "-" '(epsilon) 
                        "*" '(* factor term-prime)
                        "/" '(/ factor term-prime)
@@ -147,16 +147,16 @@
                        "or" '(epsilon) 
                        "and" '(and factor term-prime))
 ;
-(define factor (hash-copy terminal-columns))
-(hash-set*! factor "identifier" '(identifier factor-prime)
+(define factor-cols (hash-copy terminal-columns))
+(hash-set*! factor-cols "identifier" '(identifier factor-prime)
                    "-" '(- factor)
                    "if" '(if expr then expr else expr endif)
                    "not" '(not factor)
                    "boolean" '(literal)
                    "number" '(literal))
 ;
-(define factor-prime (hash-copy terminal-columns))
-(hash-set*! factor-prime "+" '(epsilon) 
+(define factor-prime-cols (hash-copy terminal-columns))
+(hash-set*! factor-prime-cols "+" '(epsilon) 
                          "-" '(epsilon) 
                          "*" '(epsilon) 
                          "/" '(epsilon) 
@@ -166,8 +166,8 @@
                          "or" '(epsilon) 
                          "and" '(epsilon) )
 ;
-(define actuals (hash-copy terminal-columns))
-(hash-set*! actuals "identifier" '(nonemptyactuals)
+(define actuals-cols (hash-copy terminal-columns))
+(hash-set*! actuals-cols "identifier" '(nonemptyactuals)
                     "-" '(nonemptyactuals)
                     ")" '(epsilon) 
                     "if" '(nonemptyactuals)
@@ -175,50 +175,51 @@
                     "boolean" '(nonemptyactuals)
                     "number" '(nonemptyactuals))
 ;
-(define nonemptyactuals (hash-copy terminal-columns))
-(hash-set*! nonemptyactuals "identifier" '(expr nonemptyactuals-prime)
+(define nonemptyactuals-cols (hash-copy terminal-columns))
+(hash-set*! nonemptyactuals-cols "identifier" '(expr nonemptyactuals-prime)
                             "-" '(expr nonemptyactuals-prime)
                             "if" '(expr nonemptyactuals-prime)
                             "not" '(expr nonemptyactuals-prime)
                             "boolean" '(expr nonemptyactuals-prime)
                             "number" '(expr nonemptyactuals-prime))
 ;
-(define nonemptyactuals-prime (hash-copy terminal-columns))
-(hash-set*! nonemptyactuals-prime ")" '(epsilon) 
+(define nonemptyactuals-prime-cols (hash-copy terminal-columns))
+(hash-set*! nonemptyactuals-prime-cols ")" '(epsilon) 
                                   "," '(|,| expr nonemptyactuals-prime))
 ;
-(define literal (hash-copy terminal-columns))
-(hash-set*! literal "boolean" '(boolean) "number" '(number))
+(define literal-cols (hash-copy terminal-columns))
+(hash-set*! literal-cols "boolean" '(boolean) "number" '(number))
 ;
-(define print (hash-copy terminal-columns))
-(hash-set*! print "print" '(print |(| expr |)|))
+(define print-cols (hash-copy terminal-columns))
+(hash-set*! print-cols "print" '(print |(| expr |)|))
 ;
                        
                         
 
 
 (define parse-table
-  (hash 'program 
-        'defintions 
-        'defintions-prime 
-        'def 
-        'formals 
-        'non-empty-formals 
-        'non-empty-formals-prime 
-        'formal 
-        'body 
-        'type 
-        'expr-prime 
-        'simple-expr 
-        'simple-expr-prime 
-        'term 
-        'term-prime 
-        'factor 
-        'factor-prime 
-        'actuals 
-        'non-empty-actuals 
-        'non-empty-actuals-prime 
-        'literal 
-        'print ))
+  (hash 'program program-cols
+        'defintions defintions-cols
+        'defintions-prime definitions-prime-cols
+        'def def-cols
+        'formals formals-cols
+        'nonemptyformals nonemptyformals-cols
+        'nonemptyformals-prime nonemptyformals-prime-cols
+        'formal formal-cols
+        'body body-cols
+        'type type-cols
+        'expr expr-cols
+        'expr-prime expr-prime-cols
+        'simple-expr simple-expr-cols
+        'simple-expr-prime simple-expr-prime-cols
+        'term term-cols
+        'term-prime term-prime-cols
+        'factor factor-cols
+        'factor-prime factor-prime-cols
+        'actuals actuals-cols
+        'nonemptyactuals nonemptyactuals-cols 
+        'nonemptyactuals-prime nonemptyactuals-prime-cols 
+        'literal literal-cols
+        'print print-cols))
 
 ;parse-table-
