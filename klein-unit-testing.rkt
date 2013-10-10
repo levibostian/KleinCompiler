@@ -8,8 +8,6 @@
          "scanner.rkt"
          "scanner-output-klein.rkt")
 
-;(check-eq? (klein "path-to-source.kln") )
-
 (check-equal? (generate-token "boolean" "1" 1) "<keyword> boolean 1 1")
 (check-equal? (generate-token "integer" "10" 5) "<keyword> integer 10 5")
 (check-equal? (generate-token "(" "5" 5) "<punctuation> ( 5 5")
