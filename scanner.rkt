@@ -9,10 +9,6 @@
 
 (provide (all-defined-out))
 
-(define run-scanner
-  (lambda (path-name)
-    (scanner path-name)))
-
 (define check-for/add-tokens
   (lambda (current-char tokens chars)
     (cond ((stopping-char? current-char) (token-additions current-char tokens chars))
