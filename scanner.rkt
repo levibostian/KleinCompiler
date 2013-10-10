@@ -4,59 +4,10 @@
 ; 
 ; Team RackAttack
 
+(require "scanner-helper-functions.rkt")
+(require "data-types.rkt")
+
 (provide (all-defined-out))
-
-(define empty-char "")
-(define operators          (list "+" "-" "/" "*" "<" "="))
-(define whitespace         (list " " "\r" "\n" "\r\n" "\t"))
-(define type               (list "integer" "boolean"))
-(define boolean            (list "true" "false"))
-(define math-operator      (list "+" "-" "*" "/"))
-(define comparator         (list "<" "="))
-(define separator          (list "," ":"))
-(define punctuation        (list "(" ")"))
-(define conditional        (list "if" "then" "else" "endif"))
-(define primitive          (list "main" "print"))
-(define boolean-connective (list "or" "and" "not"))
-(define comment            (list "//"))
-
-(define comment?
-  (lambda (line)
-    (cond ((< (string-length line) 2) #f)
-          ((member? (substring line 0 2) comment) #t)
-          (else #f)) ))
-
-(define keyword?
-  (lambda (item)
-    (or (member? item type)
-        (member? item boolean)
-        (member? item conditional)
-        (member? item boolean-connective)
-        (member? item primitive))))
-
-(define operator?
-  (lambda (sym)
-    (or (member? sym math-operator)
-        (member? sym comparator)) ))
-
-(define num? (lambda (num) (integer? (string->number num)) ))
-(define member? (lambda (item lyst) (if (member item lyst) #t #f)))
-(define separator?   (lambda (sym ) (member? sym separator) ))
-(define punctuation? (lambda (char) (member? char punctuation) ))
-(define whitespace?  (lambda (char) (member? char whitespace) ))
-(define end-of-line? (lambda (char) (eq? (string-length char) 0) ))
-
-(define stopping-char?
-  (lambda (char)
-    (or (punctuation? char)
-        (separator?   char)
-        (operator?    char)
-        (whitespace?  char) )))
-
-(define get-next-char (lambda (code-line) (substring code-line 0 1) ))
-(define rest-of (lambda (line) (substring line 1) ))
-
-(define combine-tokens cons)
 
 (define check-for/add-tokens
   (lambda (current-char tokens char-accum column-num row-num)
@@ -82,10 +33,6 @@
         empty-char
         (string-append chars current-char)) ))
 
-
-(define run-scanner
-  (lambda (path-name)
-    (scanner path-name)))
 
 (define scanner
   (lambda (source-code-path)
