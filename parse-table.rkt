@@ -1,5 +1,7 @@
 #lang racket
 
+(define err "error")
+
 (define terminal-columns
   (hash "identifier" err
         "+"          err
