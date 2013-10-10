@@ -1,0 +1,23 @@
+First(PROGRAM) = {identifier} 
+First(DEFINITIONS) = {identifier} 
+First(DEFINITIONS`) = {identifier, e}
+First(DEF) = {identifier}
+First(FORMALS) = {e, identifier}
+First(NONEMPTYFORMALS) = {identifier}
+First(NONEMPTYFORMALS`) = {<comma>, e}
+First(FORMAL) = {identifier}
+First(BODY) = {print, if, not, identifier, number, boolean, -}
+First(TYPE) = {identifier, boolean}
+First(EXPR) = {if, not, identifier, number, boolean, -}
+First(EXPR`) = {<, =, e}
+First(SIMPLE-EXPR) = {if, not, identifier, number, boolean, -}
+First(SIMPLE-EXPR`) = {or, +, -, e}
+First(TERM) = {if, not, identifier, number, boolean, -}
+First(TERM`) = {and, *, /, e}
+First(FACTOR) = {if, not, identifier, number, boolean, -}
+First(FACTOR`) = {(, e}
+First(ACTUALS) = {e, if, not, identifier, number, boolean, -}
+First(NONEMPTYACTUALS) = {if, not, identifier, number, boolean, -}
+First(NONEMPTYACTUALS`) = {<comma>, e}
+First(LITERAL) = {number, boolean}
+First(PRINT) = {print}

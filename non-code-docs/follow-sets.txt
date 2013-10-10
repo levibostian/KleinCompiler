@@ -1,0 +1,23 @@
+Follow(PROGRAM) = {$}
+Follow(DEFINITIONS) = {$}
+Follow(DEFINITIONS`) = {$}
+Follow(DEF) = {identifier, $}
+Follow(FORMALS) = {)}
+Follow(NONEMPTYFORMALS) = {)} 
+Follow(NONEMPTYFORMALS`) = {)}
+Follow(FORMAL) = {<comma>, )}
+Follow(BODY) = {identifier, $}
+Follow(TYPE) = {print, if, not, identifier, number, boolean, -, <comma>, )}
+Follow(EXPR) = {then, else, endif, and, *, /, or, +, -, <, =, <comma>, ), identifier, $}
+Follow(EXPR`) = {then, else, endif, and, *, /, or, +, -, <, =, <comma>, ), identifier, $}
+Follow(SIMPLE-EXPR) = {<, =}
+Follow(SIMPLE-EXPR`) = {<, =}
+Follow(TERM) = {or, +, -, <, =}
+Follow(TERM`) = {or, +, -, <, =}
+Follow(FACTOR) = {and, *, /, or, +, -, <, =}
+Follow(FACTOR`) = {and, *, /, or, +, -, <, =}
+Follow(ACTUALS) = {)}
+Follow(NONEMPTYACTUALS) = {)}
+Follow(NONEMPTYACTUALS`) = {)}
+Follow(LITERAL) = {and, *, /, or, +, -, <, =}
+Follow(PRINT) = {print, if, not, identifier, number, boolean, -}
