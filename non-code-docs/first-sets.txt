@@ -14,7 +14,7 @@ First(SIMPLE-EXPR) = {if, not, identifier, number, boolean, -}
 First(SIMPLE-EXPR`) = {or, +, -, e}
 First(TERM) = {if, not, identifier, number, boolean, -}
 First(TERM`) = {and, *, /, e}
-First(FACTOR) = {if, not, identifier, First(LITERAL), -} = {if, not, identifier, number, boolean, -}
+First(FACTOR) = {if, not, identifier, number, boolean, -}
 First(FACTOR`) = {(, e}
 First(ACTUALS) = {e, if, not, identifier, number, boolean, -}
 First(NONEMPTYACTUALS) = {if, not, identifier, number, boolean, -}
