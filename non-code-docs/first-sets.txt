@@ -1,0 +1,23 @@
+First(PROGRAM) = {First(DEFINITIONS)} = {identifier} 
+First(DEFINITIONS) = {First(DEF)} = {identifier} 
+First(DEFINITIONS`) = {First(DEF), e} = {identifier, e}
+First(DEF) = {identifier}
+First(FORMALS) = {e, First(NONEMPTYFORMALS)} = {e, identifier}
+First(NONEMPTYFORMALS) = {First(FORMAL)} = {identifier}
+First(NONEMPTYFORMALS`) = { <comma>, e}
+First(FORMAL) = {identifier}
+First(BODY) = {First(PRINT), First(EXPR)} = {print, if, not, identifier, number, boolean, -}
+First(TYPE) = {identifier, boolean}
+First(EXPR) = {First(SIMPLE-EXPR)} = {if, not, identifier, number, boolean, -}
+First(EXPR`) = {<, =, e}
+First(SIMPLE-EXPR) = {First(TERM)} {if, not, identifier, number, boolean, -}
+First(SIMPLE-EXPR`) = {or, +, -, e}
+First(TERM) = {First(FACTOR)} = {if, not, identifier, number, boolean, -}
+First(TERM`) = {and, *, /, e}
+First(FACTOR) = {if, not, identifier, First(LITERAL), -} = {if, not, identifier, number, boolean, -}
+First(FACTOR`) = {(, e}
+First(ACTUALS) = {e, First(NONEMPTYACTUALS)} = {e, if, not, identifier, number, boolean, -}
+First(NONEMPTYACTUALS) = {First(EXPR)} = {if, not, identifier, number, boolean, -}
+First(NONEMPTYACTUALS`) = {<comma>, e}
+First(LITERAL) = {number, boolean}
+First(PRINT) = {print}
