@@ -8,8 +8,6 @@
          "scanner.rkt"
          "scanner-output-klein.rkt")
 
-;(check-eq? (klein "path-to-source.kln") )
-
 (check-equal? (generate-token "boolean" "1" 1) "<keyword> boolean 1 1")
 (check-equal? (generate-token "integer" "10" 5) "<keyword> integer 10 5")
 (check-equal? (generate-token "(" "5" 5) "<punctuation> ( 5 5")
@@ -69,9 +67,14 @@
 (check-equal? (get-column-num "integer" 8) "1") 
 
 (check-equal? (reset-or-accum-chars "(" "main") "")
+<<<<<<< HEAD
 (check-equal? (check-for/add-tokens "*" '() "main" 10 3) '("<operator> * 10 3" "<keyword> main 6 3"))
 
 (check-equal? (check-for/add-tokens "}" '() "main" 5 1) '())
+=======
+(check-equal? (check-for/add-tokens "*" '() "main") '("<operator> *" "<keyword> main"))
+(check-equal? (check-for/add-tokens "}" '() "main") '())
+>>>>>>> master
 
 ;SCANNER OUTPUT CHECKS
 (check-equal? (scanner "klein-programs/euclid.kln")               klein/euclid-output)
