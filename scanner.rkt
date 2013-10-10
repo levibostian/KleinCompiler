@@ -4,9 +4,6 @@
 ; 
 ; Team RackAttack
 
-
-
-
 (require "scanner-helper-functions.rkt")
 (require "data-types.rkt")
 
