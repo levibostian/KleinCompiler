@@ -48,7 +48,7 @@
 (hash-set*! nonemptyformals-prime-cols "," '(|,| formal nonemptyformals-prime))
 ;
 (define formal-cols (hash-copy terminal-columns))
-;(hash-set*! formal-cols "identifier" '(identifier : type)) INCOMPLETE
+(hash-set*! formal-cols "identifier" '(identifier : type))
 ;
 (define body-cols (hash-copy terminal-columns))
 (hash-set*! body-cols "identifier" '(expr) "-" '(expr) "if" '(expr) "not" '(expr) "boolean" '(expr) "print" '(print body) )
