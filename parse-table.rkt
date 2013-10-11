@@ -51,7 +51,7 @@
 (hash-set*! nonemptyformals-prime-cols "," '(|,| formal nonemptyformals-prime))
 ;
 (define formal-cols (hash-copy terminal-columns))
-;(hash-set*! formal-cols "identifier" '(identifier : type)) INCOMPLETE
+(hash-set*! formal-cols "identifier" '(identifier : type))
 ;
 (define body-cols (hash-copy terminal-columns))
 (hash-set*! body-cols "identifier" '(expr) "-" '(expr) "if" '(expr) "not" '(expr) "boolean" '(expr) "print" '(print body) )
@@ -60,7 +60,12 @@
 (hash-set*! type-cols "boolean" '(boolean) "integer" '(integer))
 ;
 (define expr-cols (hash-copy terminal-columns))
-;(hash-set*! expr-cols "expr" ;INCOMPLETE
+(hash-set*! expr-cols "if" '(simple-expr expr-prime)
+                      "not" '(simple-expr expr-prime)
+                      "identifier" '(simple-expr expr-prime)
+                      "number" '(simple-expr expr-prime)
+                      "boolean" '(simple-expr expr-prime)
+                      "-" '(simple-expr expr-prime))
 ;
 (define expr-prime-cols (hash-copy terminal-columns))
 (hash-set*! expr-prime-cols "identifier" '(epsilon) 
