@@ -87,3 +87,9 @@
 (check-equal? (scanner "klein-programs/lib.kln")                  klein/lib-output)
 (check-equal? (scanner "klein-programs/sieve.kln")                klein/sieve-output)
 
+(define token-stream (scanner-stream (scanner "klein-programs/euclid.kln")))
+(check-equal? (send-args-to-func token-stream 'current) "<identifier> remainder" )
+(check-equal? (send-args-to-func token-stream 'peek) "<punctuation> (" )
+(check-equal? (send-args-to-func token-stream 'next) "<punctuation> (" )
+(check-equal? (send-args-to-func token-stream 'peek) "<identifier> a" )
+

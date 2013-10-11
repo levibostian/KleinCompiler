@@ -33,6 +33,30 @@
         empty-char
         (string-append chars current-char)) ))
 
+;stolen from Dr. Wallingford, session27 cs3540
+(define send-args-to-func
+  (lambda (object message . args)
+    (apply (look-up-method object message) args)))
+
+(define look-up-method
+  (lambda (object selector)
+    (object selector)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define scanner-stream
+  (lambda (scanner-output)
+    (lambda (operation)
+      (case operation
+        ('next
+          (lambda ()
+            (set! scanner-output (cdr scanner-output))
+            (car scanner-output) ))
+        ('peek
+          (lambda ()
+            (cadr scanner-output) ))
+        ('current
+          (lambda ()
+            (car scanner-output) ))))))
+
 
 (define scanner
   (lambda (source-code-path)
