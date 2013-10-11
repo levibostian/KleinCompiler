@@ -1,0 +1,8 @@
+main(num : integer) : integer
+    divisiblebytwo(num, 0)
+
+divisiblebytwo(num : integer, counter : integer) : integer
+    if num = 0 or if num = 1
+        counter
+    else 
+        divisiblebytwo(num - 2, counter + 1)
