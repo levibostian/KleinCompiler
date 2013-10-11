@@ -60,6 +60,9 @@
   (lambda (top-of-stack token)
     (or (equal? top-of-stack (token-value token))
         (eq? top-of-stack (terminal-for token)))))
+(define end-of-file-token?
+  (lambda (token)
+    (equal? (token-type token) '<end-of-file>) ))
 ;;;Stack;;;
 (define get-top-of-stack car)
 (define pop cdr)
@@ -110,11 +113,13 @@
 ;;;Error-check;;;
 (define print-error
   (lambda (token stack)
-    (list  'ERROR: 'with 
-           (symbol->string (token-value token)) 
-           'on 'column:  (token-col token) 
-           'on 'row: (token-row token)
-           'stack: stack ) ))
+    (if (end-of-file-token? token)
+        (list 'Compile 'abort. 'Source 'code 'file 'empty.)
+        (list  'ERROR: 'with 
+               (symbol->string (token-value token)) 
+               'on 'column:  (token-col token) 
+               'on 'row: (token-row token)
+               'stack: stack )) ))
 (define transition-error?
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
