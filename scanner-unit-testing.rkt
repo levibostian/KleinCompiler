@@ -6,20 +6,21 @@
 
 (require rackunit
          "scanner.rkt"
-         "scanner-output-klein.rkt")
+         "scanner-output-klein.rkt"
+         "scanner-helper-functions.rkt"
+         "data-types.rkt")
 
-(check-equal? (generate-token "boolean" "1" 1) "<keyword> boolean 1 1")
-(check-equal? (generate-token "integer" "10" 5) "<keyword> integer 10 5")
-(check-equal? (generate-token "(" "5" 5) "<punctuation> ( 5 5")
-(check-equal? (generate-token ")" "2" 1) "<punctuation> ) 2 1")
-(check-equal? (generate-token ":" "1" 10) "<separator> : 1 10")
-(check-equal? (generate-token "," "3" 19) "<separator> , 3 19")
-(check-equal? (generate-token "rackAttack" "5" 13) "<identifier> rackAttack 5 13")
+(check-equal? (generate-token "boolean" "1" 1) '(<keyword> boolean "1" "1"))
+(check-equal? (generate-token "integer" "10" 5) '(<keyword> integer "10" "5"))
+(check-equal? (generate-token "(" "5" 5) '(<punctuation> |(| "5" "5"))
+(check-equal? (generate-token ")" "2" 1) '(<punctuation> |)| "2" "1"))
+(check-equal? (generate-token ":" "1" 10) '(<separator> : "1" "10"))
+(check-equal? (generate-token "," "3" 19) '(<separator> |,| "3" "19"))
+(check-equal? (generate-token "rackAttack" "5" 13) '(<identifier> rackAttack "5" "13"))
 
 ;;----------------------------------------
 ;; Helper functions: 
 ;;----------------------------------------
-(check-equal? (rest-of "racket") "acket")
 (check-true (member? "a" (list "a" "b" "c")))
 (check-true (punctuation? "("))
 (check-true (punctuation? ")"))
@@ -67,11 +68,11 @@
 (check-equal? (get-column-num "integer" 8) "1") 
 
 (check-equal? (reset-or-accum-chars "(" "main") "")
-(check-equal? (check-for/add-tokens "*" '() "main" 10 3) '("<operator> * 10 3" "<keyword> main 6 3"))
+(check-equal? (check-for/add-tokens "*" '() "main" 10 3) '((<operator> * "10" "3") (<keyword> main "6" "3")))
 
 (check-equal? (check-for/add-tokens "}" '() "main" 5 1) '())
-(check-equal? (check-for/add-tokens "*" '() "main") '("<operator> *" "<keyword> main"))
-(check-equal? (check-for/add-tokens "}" '() "main") '())
+(check-equal? (check-for/add-tokens "*" '() "main" 9 0) '((<operator> * "9" "0") (<keyword> main "5" "0")))
+(check-equal? (check-for/add-tokens "}" '() "main" 1 2) '())
 
 ;SCANNER OUTPUT CHECKS
 (check-equal? (scanner "klein-programs/euclid.kln")               klein/euclid-output)
@@ -83,10 +84,4 @@
 (check-equal? (scanner "klein-programs/horner-parameterized.kln") klein/horner-param-output)
 (check-equal? (scanner "klein-programs/lib.kln")                  klein/lib-output)
 (check-equal? (scanner "klein-programs/sieve.kln")                klein/sieve-output)
-
-(define token-stream (scanner-stream (scanner "klein-programs/euclid.kln")))
-(check-equal? (send-args-to-func token-stream 'current) "<identifier> remainder" )
-(check-equal? (send-args-to-func token-stream 'peek) "<punctuation> (" )
-(check-equal? (send-args-to-func token-stream 'next) "<punctuation> (" )
-(check-equal? (send-args-to-func token-stream 'peek) "<identifier> a" )
 

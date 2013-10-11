@@ -1,11 +1,18 @@
 #lang racket
+; Klein compiler
+; cs4550 - Fall 2013
+; 
+; Team RackAttack
 
 (provide (all-defined-out))
 
 (define err "error")
-(define table-look-up 
+
+;;lookup
+(define rule-for 
   (lambda (non-terminal terminal)
     (hash-ref (hash-ref parse-table non-terminal) terminal) ))
+;;self-explanatory
 (define terminal?
   (lambda (key)
     (hash-has-key? terminal-columns key) ))
@@ -219,4 +226,3 @@
         'nonemptyactuals-prime nonemptyactuals-prime-cols 
         'literal literal-cols
         'print print-cols))
-;parse-table-

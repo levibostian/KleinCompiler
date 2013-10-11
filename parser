@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# BASH scipt to execute Klein Parser program. 
+set -e
+
+racket parser.rkt $1

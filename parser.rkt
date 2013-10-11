@@ -4,25 +4,109 @@
 ; 
 ; Team RackAttack
 
+(require "scanner.rkt")
+(require "parse-table.rkt")
+
+(provide (all-defined-out))
+;;;;;;;;;;;;
+;;;Parser;;;
+(define parser
+  (lambda (source-code-path)
+    (token-reader (scanner source-code-path)) ))
+
+(define token-reader
+  (lambda (token-list)
+    (token-reader-helper '() (list 'program '$) token-list) ))
+
+(define token-reader-helper
+  (lambda (parser-accum stack token-list)
+    (let ((top-of-stack (get-top-of-stack stack))
+          (current-token (get-current-token token-list)))
+      (cond ((end? stack current-token) (printf (convert-to-display parser-accum)))
+            ((terminal? top-of-stack) 
+             (terminal-action parser-accum top-of-stack stack current-token token-list))
+            (else 
+             (non-terminal-action parser-accum top-of-stack stack current-token token-list))))))
+
+(define terminal-action
+  (lambda (parser-accum top-of-stack stack current-token token-list)
+    (if (top=token? top-of-stack current-token)
+        (token-reader-helper parser-accum (pop stack) (consume token-list))
+        (print-error current-token stack))))
+(define non-terminal-action
+  (lambda (parser-accum top-of-stack stack current-token token-list)
+    (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
+      (if (transition-error? grammar-rule) 
+          (print-error (get-current-token token-list) grammar-rule)
+          (token-reader-helper (gather-parser-output parser-accum top-of-stack current-token)
+                               (check-for-push (pop stack) grammar-rule)
+                               token-list )))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Edit list of functions to be displayed per line;;;
+(define convert-to-display
+  (lambda (parser-accum)
+    (string-join 
+     (reverse 
+      (map (compose (lambda (x) (string-join x " "))
+                    (compose reverse (lambda (x) (map symbol->string x))))
+           parser-accum))
+     "\n")))
+(define gather-parser-output
+  (lambda (parser-accum top-of-stack token)
+    (cond ((eq? top-of-stack 'def)    (cons (list (token-value token)) parser-accum))
+          ((eq? top-of-stack 'formal) (cons (cons (token-value token) (car parser-accum)) 
+                                            (cdr parser-accum)))
+          (else parser-accum ))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Misc helper function;;;
+(define end? 
+  (lambda (stack token-list)
+    (and (end-of-stream? (get-top-of-stack stack)) (end-input-stream? token-list))))
+(define top=token?
+  (lambda (top-of-stack token)
+    (or (equal? top-of-stack (token-value token))
+        (eq? top-of-stack (terminal-for token)))))
+(define end-of-file-token?
+  (lambda (token)
+    (equal? (token-type token) '<end-of-file>) ))
+(define compose
+  (lambda (f g)
+    (lambda (lst)
+      (f (g lst)))))
+;;;;;;;;;;;
+;;;Stack;;;
+(define get-top-of-stack car)
 (define pop cdr)
-(define top-of-stack car)
+(define push
+  (lambda (stack value)
+    (append value stack) ))
+(define end-of-stream?
+  (lambda (item)
+    (equal? '$ item)) )
+(define check-for-push
+  (lambda (stack rule)
+    (if (equal? rule '(epsilon))
+        stack
+        (push stack rule))))
+;;;;;;;;;;;;;;;;;;
+;;;Token-stream;;;
 (define next-token cadr)
-(define current-token car)
-(define rest-of-tokens cdr)
+(define get-current-token car)
+(define consume cdr)
+(define end-input-stream?
+  (lambda (token)
+    (equal? '$ (token-value token))))
+;;;;;;;;;;;;
+;;;Tokens;;;
 (define token-type car)
 (define token-value cadr)
 (define token-col caddr)
 (define token-row cadddr)
-(define end-of-tokens?
-  (lambda (stack)
-    (eq? '$ (top-of-stack stack)) ))
-(define identifier? 
-  (lambda (token)
-    (eq? (token-type token) '<identifier>) ))
-(define numb?
-  (lambda (token)
-    (eq? (token-type token) '<integer>) ))
-(define main?
+(define check-type?
+  (lambda (type token)
+    (eq? (token-type token) type)))
+(define main-check?
   (lambda (token)
     (eq? (token-value token) 'main) ))
 (define boolean?
@@ -30,67 +114,34 @@
     (and (or (eq? (token-value token) 'true)
              (eq? (token-value token) 'false))
          (eq? (token-type token) '<keyword>)) ))
-(define not-error?
-  (lambda (grammer-rule)
-    (not (eq? grammer-rule err)) ))
-(define push
-  (lambda (stack value)
-    (append value stack) ))
-
-(require "scanner.rkt")
-(require "parse-table.rkt")
-
-(provide (all-defined-out))
-
-(define parser
-  (lambda (source-code-path)
-    (token-reader (scanner source-code-path)) ))
-
-(define token-reader
-  (lambda (token-list)
-    (token-reader-helper "" (list 'program '$) token-list) ))
-
-(define token-reader-helper
-  (lambda (parser-accum stack token-list)
-    (if (and (end-of-tokens? stack) (eq? 1 (length token-list)))
-        parser-accum
-        (cond ((terminal? (top-of-stack stack)) 
-               (if (eq? (top-of-stack stack) (terminal-look-up (current-token token-list)))
-                   (token-reader-helper (doin-it-live parser-accum token-list (pop stack)) (pop stack) (rest-of-tokens token-list))
-                   (print-error (current-token token-list))))
-              (else 
-               (let ((grammer-rule (table-look-up (top-of-stack stack) (terminal-look-up (current-token token-list)))))
-                 (if (not-error? grammer-rule)
-                     (if (equal? grammer-rule '(epsilon))
-                         (token-reader-helper parser-accum (pop stack) token-list)
-                         (token-reader-helper parser-accum (push (pop stack) grammer-rule) token-list))
-                     (print-error (current-token token-list)))))) )))
-
-(define doin-it-live
-  (lambda (parser-accum token-list stack)
-    (cond ((and (and (or (equal? (token-type (current-token token-list)) '<identifier>)
-                         (equal? (token-value (current-token token-list)) 'main))
-                     (equal? (top-of-stack (pop stack)) 'formals))
-                (or (equal? (token-value (next-token token-list)) '|(|)
-                    (equal? (token-value (next-token token-list)) ':)))
-           (string-append (symbol->string (token-value (current-token token-list))) " " parser-accum))
-          ((and (equal? (token-value (current-token token-list)) '|)|)
-                (equal? (token-value (next-token token-list)) ':))
-           (string-append parser-accum "\n"))
-          (else
-           parser-accum)) ))
-
-(define print-error
+(define terminal-for
   (lambda (token)
-    (string-append "ERROR: with " (symbol->string (token-value token)) " on column: " (token-col token) " on row: " (token-row token)) ))
-
-(define terminal-look-up
-  (lambda (token)
-    (cond ((or (identifier? token)
-               (main? token)) 'identifier)
-          ((numb? token) 'number)
+    (cond ((or (check-type? '<identifier> token)
+               (main-check? token)) 'identifier)
+          ((check-type? '<integer> token) 'number)
           ((boolean? token) 'boolean)
-          (else
-           (token-value token))) ))
-;(parser "klein-programs/euclid.kln")
-(parser "klnexamples/pattern.kln")
+          (else (token-value token))) ))
+;;;;;;;;;;;;;;;;;
+;;;Error-check;;;
+(define print-error
+  (lambda (token stack)
+    (if (end-of-file-token? token)
+        (list 'Compile 'abort. 'Source 'code 'file 'empty.)
+        (list  'ERROR: 'with 
+               (symbol->string (token-value token)) 
+               'on 'column:  (token-col token) 
+               'on 'row: (token-row token)
+               'stack: stack )) ))
+(define transition-error?
+  (lambda (grammar-rule)
+    (eq? grammar-rule err)) )
+;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
+(parser "klein-programs/euclid.kln")
+(parser "klein-programs/horner.kln")
+(parser "klein-programs/circular-prime.kln")
+(parser "klein-programs/farey.kln")
+(parser "klein-programs/fibonacci.kln")
+(parser "klein-programs/horner-parameterized.kln")
+
