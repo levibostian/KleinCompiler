@@ -16,41 +16,48 @@
 
 (define token-reader
   (lambda (token-list)
-    (token-reader-helper "" (list 'program '$) token-list) ))
+    (token-reader-helper '() (list 'program '$) token-list) ))
 
 (define token-reader-helper
   (lambda (parser-accum stack token-list)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
-      (cond ((end? stack current-token) (printf parser-accum))
+      (cond ((end? stack current-token) (printf (convert-to-display parser-accum)))
             ((terminal? top-of-stack) 
              (terminal-action parser-accum top-of-stack stack current-token token-list))
-             (else
-              (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
-                (if (transition-error? grammar-rule) 
-                    (print-error (get-current-token token-list) grammar-rule)
-                    (token-reader-helper (parser-output parser-accum top-of-stack current-token)
-                                         (check-for-push (pop stack) grammar-rule)
-                                         token-list ))))))))
-
-(define parser-output
-  (lambda (parser-accum top-of-stack token)
-    (cond ((eq? top-of-stack 'def) (string-append parser-accum
-                                                  (symbol->string (token-value token))
-                                                  " "))
-          ((eq? top-of-stack 'formal) (string-append parser-accum
-                                                    (symbol->string (token-value token))
-                                                    " "))
-          ((eq? top-of-stack 'body) (string-append parser-accum
-                                                   "\n"))
-          (else parser-accum ))))
+            (else 
+             (non-terminal-action parser-accum top-of-stack stack current-token token-list))))))
 
 (define terminal-action
   (lambda (parser-accum top-of-stack stack current-token token-list)
     (if (top=token? top-of-stack current-token)
         (token-reader-helper parser-accum (pop stack) (consume token-list))
         (print-error current-token stack))))
-    
+(define non-terminal-action
+  (lambda (parser-accum top-of-stack stack current-token token-list)
+    (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
+      (if (transition-error? grammar-rule) 
+          (print-error (get-current-token token-list) grammar-rule)
+          (token-reader-helper (gather-parser-output parser-accum top-of-stack current-token)
+                               (check-for-push (pop stack) grammar-rule)
+                               token-list )))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Edit list of functions to be displayed per line;;;
+(define convert-to-display
+  (lambda (parser-accum)
+    (string-join 
+     (reverse 
+      (map (compose (lambda (x) (string-join x " "))
+                    (compose reverse (lambda (x) (map symbol->string x))))
+           parser-accum))
+     "\n")))
+(define gather-parser-output
+  (lambda (parser-accum top-of-stack token)
+    (cond ((eq? top-of-stack 'def)    (cons (list (token-value token)) parser-accum))
+          ((eq? top-of-stack 'formal) (cons (cons (token-value token) (car parser-accum)) 
+                                            (cdr parser-accum)))
+          (else parser-accum ))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Misc helper function;;;
 (define end? 
@@ -63,6 +70,10 @@
 (define end-of-file-token?
   (lambda (token)
     (equal? (token-type token) '<end-of-file>) ))
+(define compose
+  (lambda (f g)
+    (lambda (lst)
+      (f (g lst)))))
 ;;;;;;;;;;;
 ;;;Stack;;;
 (define get-top-of-stack car)
@@ -125,3 +136,12 @@
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
 ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
+(parser "klein-programs/euclid.kln")
+(parser "klein-programs/horner.kln")
+(parser "klein-programs/circular-prime.kln")
+(parser "klein-programs/farey.kln")
+(parser "klein-programs/fibonacci.kln")
+(parser "klein-programs/horner-parameterized.kln")
+
