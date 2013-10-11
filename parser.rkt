@@ -110,7 +110,7 @@
           ((check-type? '<integer> token) 'number)
           ((boolean? token) 'boolean)
           (else (token-value token))) ))
-;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
 ;;;Error-check;;;
 (define print-error
   (lambda (token stack)
