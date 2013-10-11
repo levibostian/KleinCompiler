@@ -81,8 +81,9 @@
     (if (stopping-char? current-char)
         empty-char
         (string-append chars current-char)) ))
+
 ;stolen from Dr. Wallingford, session27 cs3540
-(define send                        ; or even "<-"
+(define send-args-to-func
   (lambda (object message . args)
     (apply (look-up-method object message) args)))
 
