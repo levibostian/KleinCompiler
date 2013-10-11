@@ -47,7 +47,7 @@
    error in parser. When the token-list is empty but there are still items
    on the stack to pop off, the parser needs to be able to run more
    to pop off remaining items of stack. The parser would attempt to
-   retreive the next item of the token-list, (car token-list), on an
+   retrieve the next item of the token-list, (car token-list), on an
    empty token-list. After brainstorming, this implementation was decided.
 
 /// Parser Execution:
@@ -96,6 +96,11 @@ parser
    Bash shell script to execute parser
 parser.rkt
    Klein parser racket source file
+parser-output-klein.rkt
+   expected output of example program files from Dr Wallingford
+   to run against unit tests for parser
+parser-unit-testing.rkt
+   RackUnit unit tests created for parser
 parse-table.rkt
    racket source file of hash parser table
 pull.sh
