@@ -2,3 +2,6 @@
 *.rkt~
 compiled/
 *.bak
+
+# ignore files by LibreOffice
+.~lock.*
