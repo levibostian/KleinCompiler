@@ -8,7 +8,7 @@
 (require "parse-table.rkt")
 
 (provide (all-defined-out))
-
+;;;;;;;;;;;;
 ;;;Parser;;;
 (define parser
   (lambda (source-code-path)
@@ -50,9 +50,9 @@
     (if (top=token? top-of-stack current-token)
         (token-reader-helper parser-accum (pop stack) (consume token-list))
         (print-error current-token stack))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Misc helper function;;;
 (define end? 
   (lambda (stack token-list)
     (and (end-of-stream? (get-top-of-stack stack)) (end-input-stream? token-list))))
@@ -63,6 +63,7 @@
 (define end-of-file-token?
   (lambda (token)
     (equal? (token-type token) '<end-of-file>) ))
+;;;;;;;;;;;
 ;;;Stack;;;
 (define get-top-of-stack car)
 (define pop cdr)
@@ -77,7 +78,7 @@
     (if (equal? rule '(epsilon))
         stack
         (push stack rule))))
-;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;
 ;;;Token-stream;;;
 (define next-token cadr)
 (define get-current-token car)
@@ -85,7 +86,7 @@
 (define end-input-stream?
   (lambda (token)
     (equal? '$ (token-value token))))
-;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;
 ;;;Tokens;;;
 (define token-type car)
 (define token-value cadr)
@@ -124,10 +125,3 @@
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
 ;;;;;;;;;;;;;;;;;
-
-(parser "klein-programs/euclid.kln")
-(parser "klein-programs/horner.kln")
-(parser "klein-programs/circular-prime.kln")
-(parser "klein-programs/farey.kln")
-(parser "klein-programs/fibonacci.kln")
-(parser "klein-programs/horner-parameterized.kln")
