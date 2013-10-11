@@ -10,11 +10,12 @@ sqrrootwithguess (guess : integer, x : integer) : integer
         guess
     else
         sqrrootwithguess(improve(guess , x), x)
+    endif
 
 average (a : integer, b : integer) : integer
     (a + b) / 2
 
-improve (guess : integer, x : intger) : integer
+improve (guess : integer, x : integer) : integer
     average(guess, (x / guess))
 
 goodenough (guess : integer, x : integer) : boolean

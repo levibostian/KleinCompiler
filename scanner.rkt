@@ -33,30 +33,9 @@
         empty-char
         (string-append chars current-char)) ))
 
-;stolen from Dr. Wallingford, session27 cs3540
-(define send-args-to-func
-  (lambda (object message . args)
-    (apply (look-up-method object message) args)))
-
-(define look-up-method
-  (lambda (object selector)
-    (object selector)))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define scanner-stream
-  (lambda (scanner-output)
-    (lambda (operation)
-      (case operation
-        ('next
-          (lambda ()
-            (set! scanner-output (cdr scanner-output))
-            (car scanner-output) ))
-        ('peek
-          (lambda ()
-            (cadr scanner-output) ))
-        ('current
-          (lambda ()
-            (car scanner-output) ))))))
-
+(define add-end-of-file-token
+  (lambda (token-list col row)
+    (cons (list '<end-of-file> '$ col row) token-list) ))
 
 (define scanner
   (lambda (source-code-path)
@@ -71,7 +50,7 @@
   (lambda (port token-list row-in-file)
     (let ((next-line-code (read-line port)))
       (if (eof-object? next-line-code)
-          token-list
+          (add-end-of-file-token token-list 1 row-in-file)
           (let ((token-result 
                  (line-reader next-line-code token-list empty-char 1 row-in-file)))
             (file-reader-helper port token-result (+ 1 row-in-file))))) ))
@@ -99,7 +78,7 @@
 
 (define build-token
   (lambda (token-name char-or-accum column-num row-num)
-    (list (string->symbol token-name) char-or-accum column-num (number->string row-num)) ))
+    (list (string->symbol token-name) (string->symbol char-or-accum) column-num (number->string row-num)) ))
 
 (define get-column-num ;instead of column num being end of char-or-accum, make it beginning
   (lambda (char-or-accum column-num)
