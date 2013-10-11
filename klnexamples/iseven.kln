@@ -1,0 +1,13 @@
+main(num : integer) : boolean
+    iseven(num)
+
+iseven(num : integer) : boolean
+    if num = 0
+    then true
+    else 
+        if num = 1
+        then false
+        else iseven(num - 2)
+        endif
+    endif
+
