@@ -1,6 +1,9 @@
 #lang racket
 
 (define err "error")
+(define table-look-up 
+  (lambda (non-terminal terminal)
+    (hash-ref (hash-ref parse-table non-terminal) terminal) ))
 
 (define terminal-columns
   (hash "identifier" err
