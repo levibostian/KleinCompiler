@@ -17,7 +17,7 @@
 (check-equal? (generate-token "rackAttack" "5" 13) "<identifier> rackAttack 5 13")
 
 ;;----------------------------------------
-;; Helper functions: [EXPAND]
+;; Helper functions: 
 ;;----------------------------------------
 (check-equal? (rest-of "racket") "acket")
 (check-true (member? "a" (list "a" "b" "c")))
@@ -67,14 +67,11 @@
 (check-equal? (get-column-num "integer" 8) "1") 
 
 (check-equal? (reset-or-accum-chars "(" "main") "")
-<<<<<<< HEAD
 (check-equal? (check-for/add-tokens "*" '() "main" 10 3) '("<operator> * 10 3" "<keyword> main 6 3"))
 
 (check-equal? (check-for/add-tokens "}" '() "main" 5 1) '())
-=======
 (check-equal? (check-for/add-tokens "*" '() "main") '("<operator> *" "<keyword> main"))
 (check-equal? (check-for/add-tokens "}" '() "main") '())
->>>>>>> master
 
 ;SCANNER OUTPUT CHECKS
 (check-equal? (scanner "klein-programs/euclid.kln")               klein/euclid-output)
