@@ -28,7 +28,7 @@ isCircularPrimeHelper(x:integer, turns:integer):boolean
   if turns=0 then
     true
   else
-    and (
+    andy (
       isPrime(x),
       isCircularPrimeHelper( rotate(x), turns-1 )
     )//End and()
@@ -38,7 +38,7 @@ report(x:integer):boolean
   print(x)
   true
 
-and(x:boolean, y:boolean):boolean
+andy(x:boolean, y:boolean):boolean
   if x then
     y
   else
