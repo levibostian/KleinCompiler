@@ -44,7 +44,7 @@
 
 (define parser
   (lambda (source-code-path)
-      (token-reader (scanner source-code-path)) ))
+    (token-reader (scanner source-code-path)) ))
 
 (define token-reader
   (lambda (token-list)
@@ -57,14 +57,18 @@
         (cond ((terminal? (top-of-stack stack)) 
                (if (eq? (top-of-stack stack) (terminal-look-up (current-token token-list)))
                    (token-reader-helper parser-accum (pop stack) (rest-of-tokens token-list))
-                   stack))
+                   (print-error (current-token token-list))))
               (else 
                (let ((grammer-rule (table-look-up (top-of-stack stack) (terminal-look-up (current-token token-list)))))
                  (if (not-error? grammer-rule)
                      (if (equal? grammer-rule '(epsilon))
                          (token-reader-helper parser-accum (pop stack) token-list)
                          (token-reader-helper parser-accum (push (pop stack) grammer-rule) token-list))
-                     (current-token token-list))))) )))
+                     (print-error (current-token token-list)))))) )))
+
+(define print-error
+  (lambda (token)
+    (string-append "ERROR: with " (symbol->string (token-value token)) " on column: " (token-col token) " on row: " (token-row token)) ))
 
 (define terminal-look-up
   (lambda (token)
@@ -74,3 +78,4 @@
           ((boolean? token) 'boolean)
           (else
            (token-value token))) ))
+(parser "klnexamples/sqrrootwithguess.kln")

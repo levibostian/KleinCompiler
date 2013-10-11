@@ -61,7 +61,13 @@
 (hash-set*! formal-cols 'identifier '(identifier : type))
 ;
 (define body-cols (hash-copy terminal-columns))
-(hash-set*! body-cols 'identifier '(expr) '- '(expr) 'if '(expr) 'not '(expr) 'boolean '(expr) 'print '(print |(| expr |)| body) )
+(hash-set*! body-cols 'identifier '(expr) 
+                  '- '(expr) 
+                  'if '(expr) 
+                  'not '(expr) 
+                  'boolean '(expr) 
+                  'print '(print |(| expr |)| body)
+                  'number '(expr) )
 ;
 (define type-cols (hash-copy terminal-columns))
 (hash-set*! type-cols 'boolean '(boolean) 'integer '(integer))
