@@ -1,5 +1,7 @@
 #lang racket
 
+(provide (all-defined-out))
+
 (define err "error")
 (define table-look-up 
   (lambda (non-terminal terminal)

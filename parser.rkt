@@ -5,6 +5,7 @@
 ; Team RackAttack
 
 (require "scanner.rkt")
+(require "parse-table.rkt")
 
 (provide (all-defined-out))
 
