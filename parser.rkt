@@ -6,7 +6,7 @@
 
 (define pop cdr)
 (define top-of-stack car)
-(define next-token car)
+(define next-token cadr)
 (define current-token car)
 (define rest-of-tokens cdr)
 (define token-type car)
@@ -48,15 +48,15 @@
 
 (define token-reader
   (lambda (token-list)
-    (token-reader-helper '() (list 'program '$) token-list) ))
+    (token-reader-helper "" (list 'program '$) token-list) ))
 
 (define token-reader-helper
   (lambda (parser-accum stack token-list)
     (if (and (end-of-tokens? stack) (eq? 1 (length token-list)))
-        #t
+        parser-accum
         (cond ((terminal? (top-of-stack stack)) 
                (if (eq? (top-of-stack stack) (terminal-look-up (current-token token-list)))
-                   (token-reader-helper parser-accum (pop stack) (rest-of-tokens token-list))
+                   (token-reader-helper (doin-it-live parser-accum token-list (pop stack)) (pop stack) (rest-of-tokens token-list))
                    (print-error (current-token token-list))))
               (else 
                (let ((grammer-rule (table-look-up (top-of-stack stack) (terminal-look-up (current-token token-list)))))
@@ -65,6 +65,20 @@
                          (token-reader-helper parser-accum (pop stack) token-list)
                          (token-reader-helper parser-accum (push (pop stack) grammer-rule) token-list))
                      (print-error (current-token token-list)))))) )))
+
+(define doin-it-live
+  (lambda (parser-accum token-list stack)
+    (cond ((and (and (or (equal? (token-type (current-token token-list)) '<identifier>)
+                         (equal? (token-value (current-token token-list)) 'main))
+                     (equal? (top-of-stack (pop stack)) 'formals))
+                (or (equal? (token-value (next-token token-list)) '|(|)
+                    (equal? (token-value (next-token token-list)) ':)))
+           (string-append (symbol->string (token-value (current-token token-list))) " " parser-accum))
+          ((and (equal? (token-value (current-token token-list)) '|)|)
+                (equal? (token-value (next-token token-list)) ':))
+           (string-append parser-accum "\n"))
+          (else
+           parser-accum)) ))
 
 (define print-error
   (lambda (token)
@@ -78,4 +92,5 @@
           ((boolean? token) 'boolean)
           (else
            (token-value token))) ))
-(parser "klnexamples/sqrrootwithguess.kln")
+;(parser "klein-programs/euclid.kln")
+(parser "klnexamples/pattern.kln")
