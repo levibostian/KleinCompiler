@@ -22,16 +22,29 @@
   (lambda (parser-accum stack token-list)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
-      (cond ((end? stack current-token) #t)
+      (cond ((end? stack current-token) (printf parser-accum))
             ((terminal? top-of-stack) 
              (terminal-action parser-accum top-of-stack stack current-token token-list))
              (else
               (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
                 (if (transition-error? grammar-rule) 
                     (print-error (get-current-token token-list) grammar-rule)
-                    (token-reader-helper parser-accum
+                    (token-reader-helper (parser-output parser-accum top-of-stack current-token)
                                          (check-for-push (pop stack) grammar-rule)
                                          token-list ))))))))
+
+(define parser-output
+  (lambda (parser-accum top-of-stack token)
+    (cond ((eq? top-of-stack 'def) (string-append parser-accum
+                                                  (symbol->string (token-value token))
+                                                  " "))
+          ((eq? top-of-stack 'formal) (string-append parser-accum
+                                                    (symbol->string (token-value token))
+                                                    " "))
+          ((eq? top-of-stack 'body) (string-append parser-accum
+                                                   "\n"))
+          (else parser-accum ))))
+
 (define terminal-action
   (lambda (parser-accum top-of-stack stack current-token token-list)
     (if (top=token? top-of-stack current-token)
