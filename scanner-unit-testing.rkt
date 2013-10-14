@@ -77,7 +77,7 @@
 (check-equal? (check-for/add-tokens "}" '() "main" 1 2) '())
 
 (check-equal? (build-identifier-token "rackattack" 5 7) '(<identifier> rackattack "5" "7"))
-(check-equal? (build-identifier-token length-257-string 2 3) (list '<invalid-identifier> (string->symbol length-257-string) "2" "3"))
+(check-equal? (build-identifier-token length-257-string 2 3) (build-token "<invalid-identifier>" length-257-string 2 3))
 
 ;SCANNER OUTPUT CHECKS
 (check-equal? (scanner "klein-programs/euclid.kln")               klein/euclid-output)

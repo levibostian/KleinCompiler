@@ -9,30 +9,6 @@
 
 (provide (all-defined-out))
 
-(define check-for/add-tokens
-  (lambda (current-char tokens char-accum column-num row-num)
-    (cond ((stopping-char? current-char) (token-additions current-char tokens char-accum column-num row-num))
-          (else tokens) )))
-
-(define token-additions
-  (lambda (current-char tokens char-accum column-num row-num)
-    (if (whitespace? current-char)
-        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)
-        (combine-tokens (generate-token current-char (get-column-num current-char column-num) row-num)
-                        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)) )))
-
-(define add-char-accum-to-token
-  (lambda (chars tokens column-num row-num)
-    (if (eq? chars empty-char)
-        tokens
-        (combine-tokens (generate-token chars column-num row-num) tokens))))
-
-(define reset-or-accum-chars
-  (lambda (current-char chars)
-    (if (stopping-char? current-char)
-        empty-char
-        (string-append chars current-char)) ))
-
 (define add-end-of-file-token
   (lambda (token-list col row)
     (cons (list '<end-of-file> '$ col row) token-list) ))
@@ -66,7 +42,30 @@
                           (reset-or-accum-chars current-char char-accum)
                           (+ 1 column-in-file)
                           row-in-file)))) ))
+;;;;;;;;;;;
+;;;Token;;;
+(define check-type?
+  (lambda (type token)
+    (eq? (token-type token) type)))
 
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;Scanner Accessors;;;
+(define token-type car)
+(define token-value cadr)
+(define token-col caddr)
+(define token-row cadddr)
+
+;;;;;;;;;;;;;;;;;;
+;;;Token-stream;;;
+(define next-token cadr)
+(define get-current-token car)
+(define consume cdr)
+(define end-input-stream?
+  (lambda (token)
+    (equal? '$ (token-value token))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;Generators;;;;;;;;;;
 (define generate-token
   (lambda (char-or-accum column-num row-num)
     (cond ((keyword? char-or-accum)     (build-token "<keyword>"     char-or-accum column-num row-num))
@@ -87,8 +86,34 @@
   (lambda (token-name char-or-accum column-num row-num)
     (list (string->symbol token-name) (string->symbol char-or-accum) (number->string column-num) (number->string row-num)) ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Helpers;;;
 (define get-column-num ;instead of column num being end of char-or-accum, make it beginning
   (lambda (char-or-accum column-num)
     (if (stopping-char? char-or-accum)
         column-num
         (- column-num (string-length char-or-accum))) ))
+
+(define check-for/add-tokens
+  (lambda (current-char tokens char-accum column-num row-num)
+    (cond ((stopping-char? current-char) (token-additions current-char tokens char-accum column-num row-num))
+          (else tokens) )))
+
+(define token-additions
+  (lambda (current-char tokens char-accum column-num row-num)
+    (if (whitespace? current-char)
+        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)
+        (combine-tokens (generate-token current-char (get-column-num current-char column-num) row-num)
+                        (add-char-accum-to-token char-accum tokens (get-column-num char-accum column-num) row-num)) )))
+
+(define add-char-accum-to-token
+  (lambda (chars tokens column-num row-num)
+    (if (eq? chars empty-char)
+        tokens
+        (combine-tokens (generate-token chars column-num row-num) tokens))))
+
+(define reset-or-accum-chars
+  (lambda (current-char chars)
+    (if (stopping-char? current-char)
+        empty-char
+        (string-append chars current-char)) ))

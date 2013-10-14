@@ -8,8 +8,8 @@
 (require "parse-table.rkt")
 
 (provide (all-defined-out))
-;;;;;;;;;;;;
-;;;Parser;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;Parser;;;;;;;;;;;;;;;
 (define parser
   (lambda (source-code-path)
     (token-reader (scanner source-code-path)) ))
@@ -22,7 +22,7 @@
   (lambda (parser-accum stack token-list)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
-      (cond ((end? stack current-token) (printf (convert-to-display parser-accum)))
+      (cond ((end? stack current-token) #t);changed back to true, so we can test. The output is no longer needed. Functions were left in though.
             ((terminal? top-of-stack) 
              (terminal-action parser-accum top-of-stack stack current-token token-list))
             (else 
@@ -74,8 +74,8 @@
   (lambda (f g)
     (lambda (lst)
       (f (g lst)))))
-;;;;;;;;;;;
-;;;Stack;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;Stack;;;;;;;;;;;;;;
 (define get-top-of-stack car)
 (define pop cdr)
 (define push
@@ -89,23 +89,8 @@
     (if (equal? rule '(epsilon))
         stack
         (push stack rule))))
-;;;;;;;;;;;;;;;;;;
-;;;Token-stream;;;
-(define next-token cadr)
-(define get-current-token car)
-(define consume cdr)
-(define end-input-stream?
-  (lambda (token)
-    (equal? '$ (token-value token))))
-;;;;;;;;;;;;
-;;;Tokens;;;
-(define token-type car)
-(define token-value cadr)
-(define token-col caddr)
-(define token-row cadddr)
-(define check-type?
-  (lambda (type token)
-    (eq? (token-type token) type)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;Tokens;;;;;;;;;;;;;;;
 (define main-check?
   (lambda (token)
     (eq? (token-value token) 'main) ))
@@ -114,16 +99,32 @@
     (and (or (eq? (token-value token) 'true)
              (eq? (token-value token) 'false))
          (eq? (token-type token) '<keyword>)) ))
+
+(define ident-terminal   'identifier        )
+(define main-terminal    'identifier        )
+(define int-terminal     'number            )
+(define invalid-terminal 'invalid-identifier)
+(define boolean-terminal 'boolean           )
+
 (define terminal-for
   (lambda (token)
-    (cond ((or (check-type? '<identifier> token)
-               (main-check? token)) 'identifier)
-          ((check-type? '<integer> token) 'number)
-          ((check-type? '<invalid-identifier> token) 'invalid-identifier)
-          ((boolean? token) 'boolean)
-          (else (token-value token))) ))
-;;;;;;;;;;;;;;;;;
-;;;Error-check;;;
+    (cond ((<invalid-ident>-token? token) invalid-terminal)
+          ((<identifier>-token?    token) ident-terminal  )
+          ((main-check?            token) main-terminal   )
+          ((<integer>-token?       token) int-terminal    )
+          ((boolean?               token) boolean-terminal)
+          (else (token-value token)) )))
+
+;;;token types;;;
+(define <identifier>-token?    (lambda (token) (check-type? '<identifier> token)))
+(define <integer>-token?       (lambda (token) (check-type? '<integer> token)))
+(define <invalid-ident>-token? (lambda (token) (check-type? '<invalid-identifier> token)))
+(define <keyword>-token?       (lambda (token) (check-type? '<keyword> token)))
+(define <separator>-token?     (lambda (token) (check-type? '<separator> token)))
+(define <operator>-token?      (lambda (token) (check-type? '<operator> token)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;Error-check;;;;;;;;;;;;;;;;;;;;
 (define print-error
   (lambda (token stack)
     (if (end-of-file-token? token)
@@ -136,8 +137,8 @@
 (define transition-error?
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
-;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (parser "klein-programs/euclid.kln")
 (parser "klein-programs/horner.kln")
