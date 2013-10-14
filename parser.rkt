@@ -119,6 +119,7 @@
     (cond ((or (check-type? '<identifier> token)
                (main-check? token)) 'identifier)
           ((check-type? '<integer> token) 'number)
+          ((check-type? '<invalid-identifier> token) 'invalid-identifier)
           ((boolean? token) 'boolean)
           (else (token-value token))) ))
 ;;;;;;;;;;;;;;;;;

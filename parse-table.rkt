@@ -19,6 +19,7 @@
 
 (define terminal-columns
   (hash 'identifier err
+        'invalid-identifier err
         '+          err
         '-          err
         '*          err
@@ -202,6 +203,9 @@
 (define print-cols (hash-copy terminal-columns))
 (hash-set*! print-cols 'print '(print |(| expr |)|))
 ;
+;; Do not hash-set! to make all has lookups result in error
+(define invalid-identifier-cols (hash-copy terminal-columns))
+;
 (define parse-table
   (hash 'program program-cols
         'definitions definitions-cols
@@ -225,4 +229,5 @@
         'nonemptyactuals nonemptyactuals-cols 
         'nonemptyactuals-prime nonemptyactuals-prime-cols 
         'literal literal-cols
-        'print print-cols))
+        'print print-cols
+        'invalid-identifier invalid-identifier-cols))
