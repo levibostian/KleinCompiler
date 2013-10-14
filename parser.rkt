@@ -100,28 +100,30 @@
              (eq? (token-value token) 'false))
          (eq? (token-type token) '<keyword>)) ))
 
-(define ident-terminal   'identifier        )
-(define main-terminal    'identifier        )
-(define int-terminal     'number            )
-(define invalid-terminal 'invalid-identifier)
-(define boolean-terminal 'boolean           )
+(define ident-terminal     (lambda (token) 'identifier        ))
+(define main-terminal      (lambda (token) 'identifier        ))
+(define int-terminal       (lambda (token) 'number            ))
+(define invalid-terminal   (lambda (token) 'invalid-identifier))
+(define boolean-terminal   (lambda (token) 'boolean           ))
+(define operator-terminal  token-value)
+(define separator-terminal token-value)
+(define punct-terminal     token-value)
+(define keyword-terminal
+  (lambda (token)
+    (cond ((boolean? token   ) (boolean-terminal token))
+          ((main-check? token) (main-terminal token   ))
+          (else (token-value token)))))
 
 (define terminal-for
   (lambda (token)
-    (cond ((<invalid-ident>-token? token) invalid-terminal)
-          ((<identifier>-token?    token) ident-terminal  )
-          ((main-check?            token) main-terminal   )
-          ((<integer>-token?       token) int-terminal    )
-          ((boolean?               token) boolean-terminal)
+    (cond ((<invalid-ident>-token? token) (invalid-terminal   token))
+          ((<identifier>-token?    token) (ident-terminal     token))
+          ((<keyword>-token?       token) (keyword-terminal   token))
+          ((<integer>-token?       token) (int-terminal       token))
+          ((<separator>-token?     token) (separator-terminal token))
+          ((<operator>-token?      token) (operator-terminal  token))
+          ((<punctuation>-token?   token) (punct-terminal     token))
           (else (token-value token)) )))
-
-;;;token types;;;
-(define <identifier>-token?    (lambda (token) (check-type? '<identifier> token)))
-(define <integer>-token?       (lambda (token) (check-type? '<integer> token)))
-(define <invalid-ident>-token? (lambda (token) (check-type? '<invalid-identifier> token)))
-(define <keyword>-token?       (lambda (token) (check-type? '<keyword> token)))
-(define <separator>-token?     (lambda (token) (check-type? '<separator> token)))
-(define <operator>-token?      (lambda (token) (check-type? '<operator> token)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;Error-check;;;;;;;;;;;;;;;;;;;;
@@ -139,11 +141,11 @@
     (eq? grammar-rule err)) )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(parser "klein-programs/euclid.kln")
-(parser "klein-programs/horner.kln")
-(parser "klein-programs/circular-prime.kln")
-(parser "klein-programs/farey.kln")
-(parser "klein-programs/fibonacci.kln")
-(parser "klein-programs/horner-parameterized.kln")
+;
+;(parser "klein-programs/euclid.kln")
+;(parser "klein-programs/horner.kln")
+;(parser "klein-programs/circular-prime.kln")
+;(parser "klein-programs/farey.kln")
+;(parser "klein-programs/fibonacci.kln")
+;(parser "klein-programs/horner-parameterized.kln")
 

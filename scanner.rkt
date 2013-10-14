@@ -64,14 +64,24 @@
   (lambda (token)
     (equal? '$ (token-value token))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;token type checkers;;;;
+(define <identifier>-token?    (lambda (token) (check-type? '<identifier>         token)))
+(define <integer>-token?       (lambda (token) (check-type? '<integer>            token)))
+(define <invalid-ident>-token? (lambda (token) (check-type? '<invalid-identifier> token)))
+(define <keyword>-token?       (lambda (token) (check-type? '<keyword>            token)))
+(define <separator>-token?     (lambda (token) (check-type? '<separator>          token)))
+(define <operator>-token?      (lambda (token) (check-type? '<operator>           token)))
+(define <punctuation>-token?   (lambda (token) (check-type? '<punctuation>        token)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;Generators;;;;;;;;;;
 (define generate-token
   (lambda (char-or-accum column-num row-num)
-    (cond ((keyword? char-or-accum)     (build-token "<keyword>"     char-or-accum column-num row-num))
-          ((num? char-or-accum)         (build-token "<integer>"     char-or-accum column-num row-num))
-          ((operator? char-or-accum)    (build-token "<operator>"    char-or-accum column-num row-num))
-          ((separator? char-or-accum)   (build-token "<separator>"   char-or-accum column-num row-num))
+    (cond ((keyword?     char-or-accum) (build-token "<keyword>"     char-or-accum column-num row-num))
+          ((num?         char-or-accum) (build-token "<integer>"     char-or-accum column-num row-num))
+          ((operator?    char-or-accum) (build-token "<operator>"    char-or-accum column-num row-num))
+          ((separator?   char-or-accum) (build-token "<separator>"   char-or-accum column-num row-num))
           ((punctuation? char-or-accum) (build-token "<punctuation>" char-or-accum column-num row-num))
           (else (build-identifier-token char-or-accum column-num row-num))) ))
 
@@ -87,7 +97,7 @@
     (list (string->symbol token-name) (string->symbol char-or-accum) (number->string column-num) (number->string row-num)) ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;Helpers;;;
+;;;;;;;;;;;Helpers;;;;;;;;;;;;
 (define get-column-num ;instead of column num being end of char-or-accum, make it beginning
   (lambda (char-or-accum column-num)
     (if (stopping-char? char-or-accum)
