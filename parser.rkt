@@ -25,8 +25,9 @@
       (cond ((end? stack current-token) #t);changed back to true, so we can test. The output is no longer needed. Functions were left in though.
             ((terminal? top-of-stack) 
              (terminal-action parser-accum top-of-stack stack current-token token-list))
-            (else 
-             (non-terminal-action parser-accum top-of-stack stack current-token token-list))))))
+            ((non-terminal? top-of-stack)
+             (non-terminal-action parser-accum top-of-stack stack current-token token-list))
+            (else (print-error current-token stack))))))
 
 (define terminal-action
   (lambda (parser-accum top-of-stack stack current-token token-list)
