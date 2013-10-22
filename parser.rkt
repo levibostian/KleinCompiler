@@ -4,8 +4,10 @@
 ; 
 ; Team RackAttack
 
-(require "scanner.rkt")
-(require "parse-table.rkt")
+(require rackunit 
+         "scanner.rkt")
+(require rackunit
+         "parse-table.rkt")
 
 (provide (all-defined-out))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -16,32 +18,61 @@
 
 (define token-reader
   (lambda (token-list)
-    (token-reader-helper '() (list 'program '$) token-list) ))
+    (token-reader-helper '() (list 'program '$) token-list '() (token-value (get-current-token token-list))) ))
 
 (define token-reader-helper
-  (lambda (parser-accum stack token-list)
+  (lambda (parser-accum stack token-list semantic-stack previous-terminal)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
       (cond ((end? stack current-token) #t);changed back to true, so we can test. The output is no longer needed. Functions were left in though.
             ((terminal? top-of-stack) 
-             (terminal-action parser-accum top-of-stack stack current-token token-list))
+             (terminal-action parser-accum 
+                              top-of-stack 
+                              stack 
+                              current-token 
+                              token-list 
+                              semantic-stack
+                              previous-terminal))
             ((non-terminal? top-of-stack)
-             (non-terminal-action parser-accum top-of-stack stack current-token token-list))
-            (else (print-error current-token stack))))))
+             (non-terminal-action parser-accum 
+                                  top-of-stack 
+                                  stack 
+                                  current-token 
+                                  token-list
+                                  semantic-stack
+                                  previous-terminal))
+            (else (semantic-action parser-accum 
+                                   top-of-stack 
+                                   stack 
+                                   current-token 
+                                   token-list
+                                   semantic-stack
+                                   previous-terminal))))))
 
 (define terminal-action
-  (lambda (parser-accum top-of-stack stack current-token token-list)
+  (lambda (parser-accum top-of-stack stack current-token token-list semantic-stack previous-terminal)
     (if (top=token? top-of-stack current-token)
-        (token-reader-helper parser-accum (pop stack) (consume token-list))
+        (token-reader-helper parser-accum (pop stack) (consume token-list) semantic-stack current-token)
         (print-error current-token stack))))
+
 (define non-terminal-action
-  (lambda (parser-accum top-of-stack stack current-token token-list)
+  (lambda (parser-accum top-of-stack stack current-token token-list semantic-stack previous-terminal)
     (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
       (if (transition-error? grammar-rule) 
           (print-error (get-current-token token-list) grammar-rule)
           (token-reader-helper (gather-parser-output parser-accum top-of-stack current-token)
                                (check-for-push (pop stack) grammar-rule)
-                               token-list )))))
+                               token-list
+                               semantic-stack
+                               previous-terminal)))))
+(define semantic-action
+  (lambda (parser-accum top-of-stack stack current-token token-list semantic-stack previous-terminal)
+    (display "shit")
+    (token-reader-helper parser-accum
+                         (pop stack)
+                         token-list
+                         (top-of-stack semantic-stack)
+                         previous-terminal)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Edit list of functions to be displayed per line;;;
@@ -75,8 +106,8 @@
   (lambda (f g)
     (lambda (lst)
       (f (g lst)))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;Stack;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;Stack;;;;;;;;;;;;;;
 (define get-top-of-stack car)
 (define pop cdr)
 (define push
@@ -90,8 +121,8 @@
     (if (equal? rule '(epsilon))
         stack
         (push stack rule))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;Tokens;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;Tokens;;;;;;;;;;;;;;;
 (define main-check?
   (lambda (token)
     (eq? (token-value token) 'main) ))
