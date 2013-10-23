@@ -4,9 +4,11 @@
 ; 
 ; Team RackAttack
 
+(require "parser-extra.rkt"
+         "semantic-actions.rkt")
+
 (provide (all-defined-out))
 
-(define err "error")
 
 ;;lookup
 (define rule-for 
@@ -47,17 +49,17 @@
         '$          err))
 ;
 (define program-cols (hash-copy terminal-columns))
-(hash-set! program-cols 'identifier (list 'definitions) )
+(hash-set! program-cols 'identifier (list 'definitions make/program) )
 ;
 (define definitions-cols (hash-copy terminal-columns))
 (hash-set! definitions-cols 'identifier (list 'def 'definitions-prime))
 ;
 (define definitions-prime-cols (hash-copy terminal-columns))
-(hash-set*! definitions-prime-cols 'identifier (list 'def 'definitions-prime) 
+(hash-set*! definitions-prime-cols 'identifier (list 'def 'definitions-prime make/defintions) 
                                    '$          '(epsilon))
 ;
 (define def-cols (hash-copy terminal-columns))
-(hash-set! def-cols 'identifier (list 'identifier '|(| 'formals '|)| ': 'type 'body))
+(hash-set! def-cols 'identifier (list 'identifier make/identifier '|(| 'formals '|)| ': 'type 'body make/def))
 ;
 (define formals-cols (hash-copy terminal-columns))
 (hash-set*! formals-cols 'identifier (list 'nonemptyformals) 
@@ -67,24 +69,24 @@
 (hash-set*! nonemptyformals-cols 'identifier (list 'formal 'nonemptyformals-prime))
 ;
 (define nonemptyformals-prime-cols (hash-copy terminal-columns))
-(hash-set*! nonemptyformals-prime-cols '|,| (list '|,| 'formal 'nonemptyformals-prime)
+(hash-set*! nonemptyformals-prime-cols '|,| (list '|,| 'formal 'nonemptyformals-prime make/nonemptyformals)
                                        '|)| '(epsilon))
 ;
 (define formal-cols (hash-copy terminal-columns))
-(hash-set*! formal-cols 'identifier (list 'identifier ': 'type))
+(hash-set*! formal-cols 'identifier (list 'identifier make/identifier ': 'type make/formal))
 ;
 (define body-cols (hash-copy terminal-columns))
 (hash-set*! body-cols 'identifier (list 'expr) 
-                      '-       (list 'expr)
-                      'if      (list 'expr)
-                      'not     (list 'expr) 
-                      'boolean (list 'expr)
-                      'print   (list 'print '|(| 'expr '|)| 'body)
-                      'number  (list 'expr) )
+                      '-       (list 'expr make/body)
+                      'if      (list 'expr make/body)
+                      'not     (list 'expr make/body) 
+                      'boolean (list 'expr make/body)
+                      'print   (list 'print '|(| 'expr '|)| make/print-body 'body make/print-body)
+                      'number  (list 'expr make/body) )
 ;
 (define type-cols (hash-copy terminal-columns))
-(hash-set*! type-cols 'boolean (list 'boolean) 
-                      'integer (list 'integer))
+(hash-set*! type-cols 'boolean (list 'boolean make/type) 
+                      'integer (list 'integer make/type))
 ;
 (define expr-cols (hash-copy terminal-columns))
 (hash-set*! expr-cols 'if         (list 'simple-expr 'expr-prime)
@@ -98,8 +100,8 @@
 (hash-set*! expr-prime-cols 'identifier '(epsilon)
                             '|)|   '(epsilon) 
                             '|,|   '(epsilon) 
-                            '=     (list '= 'simple-expr 'expr-prime) 
-                            '<     (list '< 'simple-expr 'expr-prime)
+                            '=     (list '= 'simple-expr 'expr-prime make/equals) 
+                            '<     (list '< 'simple-expr 'expr-prime make/less-than)
                             'if    (list 'expr 'expr-prime)
                             'then  '(epsilon) 
                             'else  '(epsilon) 
@@ -117,12 +119,12 @@
 ;
 (define simple-expr-prime-cols (hash-copy terminal-columns))
 (hash-set*! simple-expr-prime-cols 'identifier '(epsilon)
-                                   '+     (list '+ 'term 'simple-expr-prime)
-                                   '-     (list '- 'term 'simple-expr-prime)
+                                   '+     (list '+ 'term 'simple-expr-prime make/addition)
+                                   '-     (list '- 'term 'simple-expr-prime make/subtraction)
                                    '|,|   '(epsilon) 
                                    '=     '(epsilon) 
                                    '<     '(epsilon) 
-                                   'or    (list 'or 'term 'simple-expr-prime)
+                                   'or    (list 'or 'term 'simple-expr-prime make/or)
                                    'then  '(epsilon) 
                                    'else  '(epsilon) 
                                    'endif '(epsilon) 
@@ -142,13 +144,13 @@
 (hash-set*! term-prime-cols 'identifier '(epsilon)
                             '+          '(epsilon) 
                             '-          '(epsilon) 
-                            '*          (list '* 'factor 'term-prime)
-                            '/          (list '/ 'factor 'term-prime)
+                            '*          (list '* 'factor 'term-prime make/multiplication)
+                            '/          (list '/ 'factor 'term-prime make/division)
                             '|,|        '(epsilon)
                             '=          '(epsilon) 
                             '<          '(epsilon)
                             'or         '(epsilon) 
-                            'and        (list 'and 'factor 'term-prime)
+                            'and        (list 'and 'factor 'term-prime make/and~)
                             'then       '(epsilon) 
                             'else       '(epsilon) 
                             'endif      '(epsilon) 
@@ -156,12 +158,12 @@
                             '$          '(epsilon))
 ;
 (define factor-cols (hash-copy terminal-columns))
-(hash-set*! factor-cols 'identifier (list 'identifier 'factor-prime)
-                        '-          (list '- 'factor)
-                        'if         (list 'if 'expr 'then 'expr 'else 'expr 'endif)
-                        'not        (list 'not 'factor)
-                        'boolean    (list 'literal)
-                        'number     (list 'literal))
+(hash-set*! factor-cols 'identifier (list 'identifier make/identifier 'factor-prime)
+                        '-          (list '- 'factor make/negative-value)
+                        'if         (list 'if 'expr 'then 'expr 'else 'expr 'endif make/if~)
+                        'not        (list 'not 'factor make/not)
+                        'boolean    (list 'literal make/boolean~)
+                        'number     (list 'literal make/number))
 ;
 (define factor-prime-cols (hash-copy terminal-columns))
 (hash-set*! factor-prime-cols 'identifier '(epsilon)

@@ -6,7 +6,7 @@
 
 
 (provide (all-defined-out))
-(require "parser.rkt")
+(require "parser-extra.rkt")
 
 (define pop-2 (compose pop pop  ))
 (define pop-3 (compose pop pop-2))
@@ -43,12 +43,12 @@
 (define-struct identifier (value))
 (define make/identifier
   (lambda (stack value)
-    (push stack (list (make-program value)))))
+    (push stack (list (make-identifier value)))))
 
 (define-struct program (definitions))
 (define make/program
   (lambda (stack value)
-    (push stack (list (make-program value)))))
+    (semantic-with-1 stack make-program)))
 
 (define-struct definitions (def definitions))
 (define make/defintions
@@ -131,10 +131,10 @@
   (lambda (stack value)
     (semantic-with-2 stack make-division)))
 
-(define-struct and (left right))
-(define make/and
+(define-struct and~ (left right))
+(define make/and~
   (lambda (stack value)
-    (semantic-with-2 stack make-and)))
+    (semantic-with-2 stack make-and~)))
 ;;;
 
 (define-struct negative-value (value))
@@ -142,10 +142,10 @@
   (lambda (stack value)
     (semantic-with-1 stack make-negative-value)))
 
-(define-struct if (test then else))
-(define make/if
+(define-struct if~ (test then else))
+(define make/if~
   (lambda (stack value)
-    (semantic-with-3 stack make-if)))
+    (semantic-with-3 stack make-if~)))
 
 (define-struct not (value))
 (define make/not
@@ -153,7 +153,7 @@
     (semantic-with-1 stack make-not)))
 
 (define-struct boolean~ (value))
-(define make/boolean
+(define make/boolean~
   (lambda (stack value)
     (push stack (list (make-boolean~ value)))))
 

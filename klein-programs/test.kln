@@ -1,0 +1,7 @@
+// Finds the GCD of two integers using Euclid's algorithm
+// based on a program by Chuck Hoffman
+
+main(a : integer, b : integer) : integer
+   main(1 < 2, 1)
+   1
+
