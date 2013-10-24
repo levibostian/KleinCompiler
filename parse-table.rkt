@@ -63,7 +63,7 @@
 ;
 (define formals-cols (hash-copy terminal-columns))
 (hash-set*! formals-cols 'identifier (list 'nonemptyformals) 
-                         '|)|        '(epsilon))
+                         '|)|        (list make/empty-formals))
 ;
 (define nonemptyformals-cols (hash-copy terminal-columns))
 (hash-set*! nonemptyformals-cols 'identifier (list 'formal 'nonemptyformals-prime))

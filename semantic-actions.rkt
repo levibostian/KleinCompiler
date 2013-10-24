@@ -65,6 +65,11 @@
                      (2nd-on-stack stack)
                      (1st-on-stack stack))))))
 
+(define-struct empty-formals ())
+(define make/empty-formals
+  (lambda (stack value)
+    (push stack (list (make-empty-formals)))))
+
 (define-struct nonemptyformals (formal nonemptyformals))
 (define make/nonemptyformals
   (lambda (stack value)
@@ -163,3 +168,5 @@
     (push stack (list (make-number value)))))
 
 ;;;
+
+;(define-struct actuals
