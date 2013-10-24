@@ -1,7 +1,10 @@
 // Finds the GCD of two integers using Euclid's algorithm
 // based on a program by Chuck Hoffman
 
-main() : integer
-   1 < 2
+main(a : integer, b : integer) : integer
+   print(1 < 1)
+   print(-1)
+   print(4)
+   main(1, 2)
    
 

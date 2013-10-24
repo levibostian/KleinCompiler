@@ -24,10 +24,10 @@
 
 (define token-reader-helper
   (lambda (parser-accum stack token-list semantic-stack previous-terminal)
-    (display stack)
-    (newline)
-    (display (get-current-token token-list))
-    (newline)
+;    (display stack)
+;    (newline)
+;;    (display (get-current-token token-list))
+;;    (newline)
 ;    (display semantic-stack)
 ;    (newline)
     (let ((top-of-stack (get-top-of-stack stack))
@@ -83,10 +83,10 @@
                          (top-of-stack semantic-stack previous-terminal)
                          previous-terminal)))
 
-(parser "klein-programs/test.kln")
+;(parser "klein-programs/test.kln")
 ;(parser "klein-programs/euclid.kln")
 ;(parser "klein-programs/horner.kln")
-;(parser "klein-programs/circular-prime.kln")
+(parser "klein-programs/circular-prime.kln")
 ;(parser "klein-programs/farey.kln")
 ;(parser "klein-programs/fibonacci.kln")
 ;(parser "klein-programs/horner-parameterized.kln")

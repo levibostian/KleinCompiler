@@ -51,9 +51,11 @@
     (semantic-with-1 stack make-program)))
 
 (define-struct definitions (def definitions))
-(define make/defintions
+(define make/definitions
   (lambda (stack value)
-    (semantic-with-2 stack make-definitions)))
+    (if (> (length stack) 1)
+        (semantic-with-2 stack make-definitions)
+        stack)))
 
 (define-struct def (id formals type body))
 (define make/def
@@ -80,6 +82,11 @@
   (lambda (stack value)
     (semantic-with-2 stack make-formal)))
 
+(define-struct print~ (expr))
+(define make/print~
+  (lambda (stack value)
+    (semantic-with-1 stack make-print~)))
+
 (define-struct body (expr))
 (define make/body
   (lambda (stack value)
@@ -88,7 +95,7 @@
 (define-struct print-body (print-expr expr))
 (define make/print-body
   (lambda (stack value)
-    (semantic-with-2 make-print-body stack)))
+    (semantic-with-2 stack make-print-body)))
 
 (define-struct type (value))
 (define make/type
@@ -169,4 +176,22 @@
 
 ;;;
 
-;(define-struct actuals
+(define-struct empty-actuals ())
+(define make/empty-actuals
+  (lambda (stack value)
+    (push stack (list (make-empty-actuals)))))
+
+(define-struct nonemptyactuals (expr))
+(define make/nonemptyactuals
+  (lambda (stack value)
+    (semantic-with-1 stack make-nonemptyactuals)))
+
+(define-struct nonemptyactuals-prime (expr nonemptyactuals))
+(define make/nonemptyactuals-prime
+  (lambda (stack value)
+    (semantic-with-2 stack make-nonemptyactuals-prime)))
+
+(define-struct function-call (name actuals))
+(define make/function-call
+  (lambda (stack value)
+    (semantic-with-2 stack make-function-call)))
