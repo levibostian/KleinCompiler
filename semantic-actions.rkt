@@ -127,10 +127,10 @@
   (lambda (stack value)
     (semantic-with-2 stack make-addition)))
 
-(define-struct or (left right))
+(define-struct or~ (left right))
 (define make/or
   (lambda (stack value)
-    (semantic-with-2 stack make-or)))
+    (semantic-with-2 stack make-or~)))
 ;;;
 ;;;TERM;;;
 (define-struct multiplication (left right))
