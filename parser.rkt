@@ -77,10 +77,10 @@
                          previous-terminal)))
 
 ;(parser "klein-programs/test.kln")
-;(parser "klein-programs/euclid.kln")
-;(parser "klein-programs/horner.kln")
-;(parser "klein-programs/circular-prime.kln")
-;(parser "klein-programs/farey.kln")
-;(parser "klein-programs/fibonacci.kln")
-;(parser "klein-programs/horner-parameterized.kln")
+(parser "klein-programs/euclid.kln")
+(parser "klein-programs/horner.kln")
+(parser "klein-programs/circular-prime.kln")
+(parser "klein-programs/farey.kln")
+(parser "klein-programs/fibonacci.kln")
+(parser "klein-programs/horner-parameterized.kln")
 
