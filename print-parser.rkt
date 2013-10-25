@@ -9,22 +9,23 @@
   
 (define catch-all
   (lambda (some-struct error amt-of-spaces)
-    (cond ((less-than? some-struct) (print/less-than some-struct amt-of-spaces))
-          ((equals? some-struct) (print/equals some-struct amt-of-spaces))
-          ((or (number? some-struct) (boolean~? some-struct)) (print/literal some-struct amt-of-spaces))
-          ((or~? some-struct) (print/or some-struct amt-of-spaces))
-          ((if~? some-struct) (print/if~ some-struct amt-of-spaces))
-          ((not? some-struct) (print/not some-struct amt-of-spaces))
+    (cond ((less-than? some-struct)      (print/less-than some-struct amt-of-spaces))
+          ((equals? some-struct)         (print/equals some-struct amt-of-spaces))
+          ((or (number? some-struct) 
+               (boolean~? some-struct))  (print/literal some-struct amt-of-spaces))
+          ((or~? some-struct)            (print/or some-struct amt-of-spaces))
+          ((if~? some-struct)            (print/if~ some-struct amt-of-spaces))
+          ((not? some-struct)            (print/not some-struct amt-of-spaces))
           ((negative-value? some-struct) (print/negative-value some-struct amt-of-spaces))
-          ((function-call? some-struct) (print/function-call some-struct amt-of-spaces))
+          ((function-call? some-struct)  (print/function-call some-struct amt-of-spaces))
           ((or (nonemptyactuals? some-struct) 
                (nonemptyactuals-prime? some-struct)) (print/actuals some-struct amt-of-spaces))
-          ((identifier? some-struct) (print/identifier some-struct "identifier" amt-of-spaces))
-          ((addition? some-struct) (print/addition some-struct amt-of-spaces))
-          ((subtraction? some-struct) (print/subtraction some-struct amt-of-spaces))
-          ((division? some-struct) (print/division some-struct amt-of-spaces))
+          ((identifier? some-struct)     (print/identifier some-struct "identifier" amt-of-spaces))
+          ((addition? some-struct)       (print/addition some-struct amt-of-spaces))
+          ((subtraction? some-struct)    (print/subtraction some-struct amt-of-spaces))
+          ((division? some-struct)       (print/division some-struct amt-of-spaces))
           ((multiplication? some-struct) (print/multiplication some-struct amt-of-spaces))
-          ((and~? some-struct) (print/and some-struct amt-of-spaces))
+          ((and~? some-struct)           (print/and some-struct amt-of-spaces))
           (else error))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;PROGRAM;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -52,6 +53,10 @@
   (lambda (ident name amt-of-spaces)
     (string-append (indent amt-of-spaces) name "(" (symbol->string (identifier-value ident)) ")\n")))
 
+(define print/empty-formals
+  (lambda (formals amt-of-spaces)
+    (string-append (indent amt-of-spaces) "no parameters\n")))
+
 (define print/nonemptyformals 
   (lambda (nonempform amt-of-spaces)
     (if (formal? nonempform)
@@ -66,14 +71,16 @@
     (if (formal? nonempform)
         (print/formal nonempform amt-of-spaces)
         (string-append (print/formal (nonemptyformals-formal nonempform) (+ 4 amt-of-spaces))
-                       (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) (+ 4 amt-of-spaces))))))
+                       (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) amt-of-spaces)))))
 
 (define print/formal
   (lambda (form amt-of-spaces)
     (if (nonemptyformals? form)
         (print/nonemptyformals form amt-of-spaces)
-        (string-append (print/identifier (formal-id form) "identifier" amt-of-spaces)  
-                       (print/type (formal-type form) "type" amt-of-spaces)))))
+        (if (empty-formals? form)
+            (print/empty-formals form amt-of-spaces)
+            (string-append (print/identifier (formal-id form) "identifier" amt-of-spaces)  
+                           (print/type (formal-type form) "type" amt-of-spaces))))))
 (define print/type
   (lambda (type~ name amt-of-spaces)
     (string-append (indent (+ 4 amt-of-spaces)) name "(" (symbol->string (type-value type~)) ")\n")))
@@ -144,12 +151,13 @@
 
 (define print/or
   (lambda (or~ amt-of-spaces)
+    (display (or~-right or~))
     (string-append (indent amt-of-spaces)
                    "or_expression\n"
-                   (print/term (or~-left or~) amt-of-spaces))
+                   (print/term (or~-left or~) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "or\n"
-                   (print/term (or~-right or~) amt-of-spaces)))
+                   (print/term (or~-right or~) amt-of-spaces))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;TERM;;;;;;;;;;;;;;;;;;;;;;;;;
 (define print/term
@@ -196,7 +204,7 @@
     (string-append (indent amt-of-spaces)
                    "function_call\n" 
                    (print/identifier (function-call-name func-call) "function_name" (+ 4 amt-of-spaces))
-                   (print/actuals (function-call-actuals func-call) amt-of-spaces))))
+                   (print/actuals (function-call-actuals func-call) (+ 4 amt-of-spaces)))))
 
 (define print/literal
   (lambda (lit amt-of-spaces)
@@ -238,7 +246,7 @@
                           "actuals\n" 
                           (catch-all (nonemptyactuals-expr acts) 
                                      (list "error - actuals" acts) 
-                                     amt-of-spaces) ))
+                                     (+ 4 amt-of-spaces)) ))
         ((nonemptyactuals-prime? acts)
          (string-append (catch-all (nonemptyactuals-prime-expr acts)
                                    (list "error - actuals" acts) 
@@ -247,8 +255,15 @@
                         ))
         ((empty-actuals? acts) (string-append (indent amt-of-spaces)
                                               "actuals()\n"))
-        (else (catch-all acts (list "error - actuals" acts) amt-of-spaces)))))
+        (else (catch-all acts (list "error - actuals" acts) (+ 4 amt-of-spaces))))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(printf (print/program (parser "klein-programs/circular-prime.kln")))
+;(printf (print/program (parser "klein-programs/circular-prime.kln")))
+;(printf (print/program (parser "klein-programs/test.kln")))
+;(printf (print/program (parser "klein-programs/euclid.kln")))
+;(printf (print/program (parser "klein-programs/horner.kln")))
+;(printf (print/program (parser "klein-programs/circular-prime.kln")))
+;(printf (print/program (parser "klein-programs/farey.kln")))
+;(printf (print/program (parser "klein-programs/fibonacci.kln")))
+;(printf (print/program (parser "klein-programs/horner-parameterized.kln")))

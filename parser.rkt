@@ -24,15 +24,9 @@
 
 (define token-reader-helper
   (lambda (parser-accum stack token-list semantic-stack previous-terminal)
-;    (display stack)
-;    (newline)
-;;    (display (get-current-token token-list))
-;;    (newline)
-;    (display semantic-stack)
-;    (newline)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
-      (cond ((end? stack current-token) (get-top-of-stack semantic-stack));changed back to true, so we can test. The output is no longer needed. Functions were left in though.
+      (cond ((end? stack current-token) (get-top-of-stack semantic-stack));these parameters will be cleaned up at some point
             ((terminal? top-of-stack) 
              (terminal-action parser-accum 
                               top-of-stack 

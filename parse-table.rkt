@@ -186,7 +186,7 @@
 (define actuals-cols (hash-copy terminal-columns))
 (hash-set*! actuals-cols 'identifier (list 'nonemptyactuals)
                          '-          (list 'nonemptyactuals)
-                         '|)|        (list make-empty-actuals) 
+                         '|)|        (list make/empty-actuals) 
                          'if         (list 'nonemptyactuals)
                          'not        (list 'nonemptyactuals)
                          'boolean    (list 'nonemptyactuals)
