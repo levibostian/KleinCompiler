@@ -8,8 +8,8 @@
 (require "parse-table.rkt")
 
 (provide (all-defined-out))
-;;;;;;;;;;;;
-;;;Parser;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;Parser;;;;;;;;;;;;;;;
 (define parser
   (lambda (source-code-path)
     (token-reader (scanner source-code-path)) ))
@@ -22,7 +22,7 @@
   (lambda (parser-accum stack token-list)
     (let ((top-of-stack (get-top-of-stack stack))
           (current-token (get-current-token token-list)))
-      (cond ((end? stack current-token) (printf (convert-to-display parser-accum)))
+      (cond ((end? stack current-token) #t);changed back to true, so we can test. The output is no longer needed. Functions were left in though.
             ((terminal? top-of-stack) 
              (terminal-action parser-accum top-of-stack stack current-token token-list))
             (else 
@@ -74,8 +74,8 @@
   (lambda (f g)
     (lambda (lst)
       (f (g lst)))))
-;;;;;;;;;;;
-;;;Stack;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;Stack;;;;;;;;;;;;;;
 (define get-top-of-stack car)
 (define pop cdr)
 (define push
@@ -89,23 +89,8 @@
     (if (equal? rule '(epsilon))
         stack
         (push stack rule))))
-;;;;;;;;;;;;;;;;;;
-;;;Token-stream;;;
-(define next-token cadr)
-(define get-current-token car)
-(define consume cdr)
-(define end-input-stream?
-  (lambda (token)
-    (equal? '$ (token-value token))))
-;;;;;;;;;;;;
-;;;Tokens;;;
-(define token-type car)
-(define token-value cadr)
-(define token-col caddr)
-(define token-row cadddr)
-(define check-type?
-  (lambda (type token)
-    (eq? (token-type token) type)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;Tokens;;;;;;;;;;;;;;;
 (define main-check?
   (lambda (token)
     (eq? (token-value token) 'main) ))
@@ -114,16 +99,34 @@
     (and (or (eq? (token-value token) 'true)
              (eq? (token-value token) 'false))
          (eq? (token-type token) '<keyword>)) ))
+
+(define ident-terminal     (lambda (token) 'identifier        ))
+(define main-terminal      (lambda (token) 'identifier        ))
+(define int-terminal       (lambda (token) 'number            ))
+(define invalid-terminal   (lambda (token) 'invalid-identifier))
+(define boolean-terminal   (lambda (token) 'boolean           ))
+(define operator-terminal  token-value)
+(define separator-terminal token-value)
+(define punct-terminal     token-value)
+(define keyword-terminal
+  (lambda (token)
+    (cond ((boolean? token   ) (boolean-terminal token))
+          ((main-check? token) (main-terminal token   ))
+          (else (token-value token)))))
+
 (define terminal-for
   (lambda (token)
-    (cond ((or (check-type? '<identifier> token)
-               (main-check? token)) 'identifier)
-          ((check-type? '<integer> token) 'number)
-          ((check-type? '<invalid-identifier> token) 'invalid-identifier)
-          ((boolean? token) 'boolean)
-          (else (token-value token))) ))
-;;;;;;;;;;;;;;;;;
-;;;Error-check;;;
+    (cond ((<invalid-ident>-token? token) (invalid-terminal   token))
+          ((<identifier>-token?    token) (ident-terminal     token))
+          ((<keyword>-token?       token) (keyword-terminal   token))
+          ((<integer>-token?       token) (int-terminal       token))
+          ((<separator>-token?     token) (separator-terminal token))
+          ((<operator>-token?      token) (operator-terminal  token))
+          ((<punctuation>-token?   token) (punct-terminal     token))
+          (else (token-value token)) )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;Error-check;;;;;;;;;;;;;;;;;;;;
 (define print-error
   (lambda (token stack)
     (if (end-of-file-token? token)
@@ -136,13 +139,13 @@
 (define transition-error?
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
-;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;
-
-(parser "klein-programs/euclid.kln")
-(parser "klein-programs/horner.kln")
-(parser "klein-programs/circular-prime.kln")
-(parser "klein-programs/farey.kln")
-(parser "klein-programs/fibonacci.kln")
-(parser "klein-programs/horner-parameterized.kln")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;(parser "klein-programs/euclid.kln")
+;(parser "klein-programs/horner.kln")
+;(parser "klein-programs/circular-prime.kln")
+;(parser "klein-programs/farey.kln")
+;(parser "klein-programs/fibonacci.kln")
+;(parser "klein-programs/horner-parameterized.kln")
 
