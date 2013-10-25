@@ -31,7 +31,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;PROGRAM;;;;;;;;;;;;;;;;;;;;;;;;;
 (define print/program
   (lambda (prog)
-    (string-append "program\n" (print/definitions (program-definitions prog) 4))))
+    (if (program? prog)
+        (string-append "program\n" (print/definitions (program-definitions prog) 4))
+         prog)))
 
 (define print/definitions
   (lambda (defin amt-of-spaces)
@@ -46,7 +48,9 @@
     (string-append (indent amt-of-spaces)
                    "function\n"
                    (print/identifier (def-id def~) "name" (+ 4 amt-of-spaces))
-                   (print/formal (def-formals def~) (+ 4 amt-of-spaces))
+                   (indent (+ 4 amt-of-spaces))
+                   "parameters\n"
+                   (print/nonemptyformals (def-formals def~) (+ 4 amt-of-spaces))
                    (print/type (def-type def~) "returns" amt-of-spaces)
                    (print/body (def-body def~) (+ 4 amt-of-spaces)))))
 (define print/identifier
@@ -60,17 +64,16 @@
 (define print/nonemptyformals 
   (lambda (nonempform amt-of-spaces)
     (if (formal? nonempform)
-        (print/formal nonempform amt-of-spaces)
-        (string-append (indent amt-of-spaces)
-                       "parameters\n" 
+        (print/formal nonempform (+ 4 amt-of-spaces))
+        (string-append  
                        (print/formal (nonemptyformals-formal nonempform) (+ 4 amt-of-spaces))
-                       (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) amt-of-spaces)))))
+                       (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) (+ 4 amt-of-spaces))))))
 
 (define print/nonemptyformals-prime
   (lambda (nonempform amt-of-spaces)
     (if (formal? nonempform)
         (print/formal nonempform amt-of-spaces)
-        (string-append (print/formal (nonemptyformals-formal nonempform) (+ 4 amt-of-spaces))
+        (string-append (print/formal (nonemptyformals-formal nonempform) amt-of-spaces)
                        (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) amt-of-spaces)))))
 
 (define print/formal
@@ -259,11 +262,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(printf (print/program (parser "klein-programs/circular-prime.kln")))
-;(printf (print/program (parser "klein-programs/test.kln")))
-;(printf (print/program (parser "klein-programs/euclid.kln")))
-;(printf (print/program (parser "klein-programs/horner.kln")))
-;(printf (print/program (parser "klein-programs/circular-prime.kln")))
-;(printf (print/program (parser "klein-programs/farey.kln")))
-;(printf (print/program (parser "klein-programs/fibonacci.kln")))
-;(printf (print/program (parser "klein-programs/horner-parameterized.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/test.kln")))
+;(display (print/program (parser "klein-programs/euclid.kln")))
+;(display (print/program (parser "klein-programs/horner.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/farey.kln")))
+;(display (print/program (parser "klein-programs/fibonacci.kln")))
+(display (print/program (parser "klein-programs/horner-parameterized.kln")))
