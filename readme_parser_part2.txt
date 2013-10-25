@@ -8,9 +8,55 @@
 *                           Levi Bostian                      *
 *                           Kyle Mueller                      *
 * ------------------------------------------------------------*
-
+   
 /// Design of Solution:
-1. 
+1. The token-reader-helper (which is the parser, essentially) has been
+   updated to include the Semantic Action portion of the algorithm.
+2. How we decided to handle semantic actions:
+     -We decided to use structs to represent a program
+     -Structs were made for ever part of the language
+   How it works: 
+     The Parser runs through the grammar like it normally did. Except now
+     the grammar includes semantic-actions, which are functions. If/when a
+     semantic action is found, we apply that function to the semantic-stack.
+     There are functions for each part of the language and they do the 
+     pushing/popping that are required. 
+     An example here is: 
+       If we have a Def, we know it's made up of 4 things. So, the struct
+       for Def has four parameters. Ident/Formals/Type/Body. When a 
+       Def semantic-action is executed (the parser doesn't know, or care 
+       what action is found, it just applies it to the semantic-stack)
+       it pops 4 things off the top of the semantic stack. It then takes 
+       these 4 things and puts them all inside a Def struct. 
+     This happens for everything in the language. Our program is
+     represented as structs within structs. 
+3. How an arbitrary amount of Defs/Formals/Actuals/etc... are handled:
+     We realized early on that this might be a problem. But, our solution
+     was pretty simple. Basically, for something like Formals, we 
+     have a nonemptyformals struct that contains a Formal followed 
+     by a nonemptyformals. When it comes to things in the language having
+     an arbitrary length we just nest the structs in the expression.
+     Example:
+       Definitions is Def/Definitions'
+       Struct looks kind of like:
+         Definitions(Def, Definitions-Prime(Def, Definitions-Prime(...)))
+4. This implementation has left the actual parser algorithm fairly clean.
+   There's a lot of parameters being thrown around, and that will be fixed,
+   but not for this turn-in. 
+5. Printing the output:
+     We made print/--- functions for each part of the language. The file
+     print-parser.rkt is going to be difficult to read, probably. 
+     Essentially what it's doing is breaking each struct down in to it's
+     parts, and calling print/--- on that part. We initially followed the
+     grammar for this, and realized it doesn't matter. We just need it to 
+     print, we don't care if an expr can print a division or an if statement.
+     So, we made a catch-all that does just that. It catches everything any kind
+     of expression can be, and prints it. This simplified a lot of the code. 
+     Then we had to add spaces. We decided to make this an argument, and pass it 
+     along to each print/--- call. We incremented by 4 where we needed to. 
+     In the end, this works. It could be cleaned up, and made a lot simpler
+     but for now it works. 
+ 
 
 /// Parser Execution:
 ***Must have racket language installed to execute parser.
