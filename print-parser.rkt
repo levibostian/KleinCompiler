@@ -162,19 +162,9 @@
 
 (define print/expr
   (lambda (exp)
-    (cond ((less-than? exp) (print/less-than exp))
-          ((equals? exp) (print/equals exp))
-          ((or (number? exp) (boolean~? exp)) (print/literal exp))
-          ((or~? exp) (print/or exp))
-          ((if~? exp) (print/if~ exp))
-          ((not? exp) (print/not exp))
-          ((negative-value? exp) (print/negative-value exp))
-          ((function-call? exp) (print/function-call exp))
-          ((or (nonemptyactuals? exp) 
-               (nonemptyactuals-prime? exp)) (print/actuals exp))
-          ((identifier? exp) (print/identifier exp "exp_name"))
+    (catch-all exp)
 
-          (else (list "error - exp" exp)))))
+          
 
 (define print/simple-expr
   (lambda (simp)
@@ -234,7 +224,21 @@
 
   
   
-  
+(define catch-call
+  (lambda (some-struct)
+    (cond ((less-than? some-struct) (print/less-than some-struct))
+          ((equals? some-struct) (print/equals some-struct))
+          ((or (number? some-struct) (boolean~? some-struct)) (print/literal some-struct))
+          ((or~? some-struct) (print/or some-struct))
+          ((if~? some-struct) (print/if~ some-struct))
+          ((not? some-struct) (print/not some-struct))
+          ((negative-value? some-struct) (print/negative-value some-struct))
+          ((function-call? some-struct) (print/function-call some-struct))
+          ((or (nonemptyactuals? some-struct) 
+               (nonemptyactuals-prime? some-struct)) (print/actuals some-struct))
+          ((identifier? some-struct) (print/identifier some-struct "identifier"))
+          (else (list "error - something wrong!" some-struct)))))
+
   
   
 ;  (printf (print/nonemptyformals (make-nonemptyformals (make-formal (make-identifier 'x) (make-type 'integer))
