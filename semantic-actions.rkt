@@ -14,24 +14,24 @@
 
 (define 1-off-top
   (lambda (stack)
-    (list (1st-on-stack stack))))
+    (list (first stack))))
 (define 2-off-top
   (lambda (stack)
-    (list (2nd-on-stack stack)
-          (1st-on-stack stack))))
+    (list (second stack)
+          (first stack))))
 (define 3-off-top
   (lambda (stack)
-    (list (3rd-on-stack stack)
-          (2nd-on-stack stack)
-          (1st-on-stack stack))))
+    (list (third stack)
+          (second stack)
+          (first stack))))
 (define 4-off-top
   (lambda (stack)
-    (list (4th-on-stack stack)
-          (3rd-on-stack stack)
-          (2nd-on-stack stack)
-          (1st-on-stack stack))))
+    (list (fourth stack)
+          (third stack)
+          (second stack)
+          (first stack))))
 
-(define semantic-action
+(define semantic-act
   (lambda (make pop-amt amt-off-top)
     (lambda (stack value)
       (push (pop-amt stack)
@@ -39,21 +39,21 @@
                          (amt-off-top stack)))))))
 (define semantic-action-1
   (lambda (make)
-    (semantic-action make pop 1-off-top)))
+    (semantic-act make pop 1-off-top)))
 (define semantic-action-2
   (lambda (make) 
-    (semantic-action make pop-2 2-off-top)))
+    (semantic-act make pop-2 2-off-top)))
 (define semantic-action-3
   (lambda (make) 
-    (semantic-action make pop-3 3-off-top)))
+    (semantic-act make pop-3 3-off-top)))
 (define semantic-action-4
   (lambda (make) 
-    (semantic-action make pop-4 4-off-top)))
+    (semantic-act make pop-4 4-off-top)))
 (define semantic-no-pops
   (lambda (make)
     (lambda (stack value)
       (push stack (list (make value))))))
-
+           
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;Semantic Actions;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

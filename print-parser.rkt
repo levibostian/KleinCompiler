@@ -18,7 +18,7 @@
           ((not? some-struct)            (print/not some-struct amt-of-spaces))
           ((negative-value? some-struct) (print/negative-value some-struct amt-of-spaces))
           ((function-call? some-struct)  (print/function-call some-struct amt-of-spaces))
-          ((or (nonemptyactuals? some-struct) 
+          ((or (nonemptyactuals? some-struct)
                (nonemptyactuals-prime? some-struct)) (print/actuals some-struct amt-of-spaces))
           ((identifier? some-struct)     (print/identifier some-struct "identifier" amt-of-spaces))
           ((addition? some-struct)       (print/addition some-struct amt-of-spaces))
@@ -264,7 +264,7 @@
 
 ;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/test.kln")))
-;(display (print/program (parser "klein-programs/euclid.kln")))
+(display (print/program (parser "klein-programs/euclid.kln")))
 ;(display (print/program (parser "klein-programs/horner.kln")))
 ;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/farey.kln")))
