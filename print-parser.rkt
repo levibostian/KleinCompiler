@@ -154,7 +154,6 @@
 
 (define print/or
   (lambda (or~ amt-of-spaces)
-    (display (or~-right or~))
     (string-append (indent amt-of-spaces)
                    "or_expression\n"
                    (print/term (or~-left or~) amt-of-spaces)
@@ -262,9 +261,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(display (print/program (parser "klein-programs/circular-prime.kln")))
+(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/test.kln")))
-(display (print/program (parser "klein-programs/euclid.kln")))
+;(display (print/program (parser "klein-programs/euclid.kln")))
 ;(display (print/program (parser "klein-programs/horner.kln")))
 ;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/farey.kln")))
