@@ -3,6 +3,8 @@
 (provide (all-defined-out))
 (require "parser-extra.rkt")
 
+(define empty-type 'null)
+
 (define op (open-output-string))
 (define get-op get-output-string)
 
@@ -64,10 +66,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;Body;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-struct identifier (value)
-  #:methods gen:custom-write
-  ((define (write-proc ident port mode)
-     (display (identifier-value ident) port))))
+(define-struct identifier (value (type #:auto))
+  #:auto-value empty-type)
    
 (define make/identifier (semantic-no-pops make-identifier))
 
@@ -91,62 +91,80 @@
 (define-struct formal (id type))
 (define make/formal (semantic-action-2 make-formal))
 
-(define-struct type (value))
+(define-struct type (value)
+#:auto-value empty-type)
 (define make/type (semantic-no-pops make-type))
 
-(define-struct print~ (expr))
+(define-struct print~ (expr (type #:auto))
+#:auto-value empty-type)
 (define make/print~ (semantic-action-1 make-print~))
 
-(define-struct body (expr))
+(define-struct body (expr (type #:auto))
+#:auto-value empty-type)
 (define make/body (semantic-action-1 make-body)) 
 
-(define-struct print-body (print-expr expr))
+(define-struct print-body (print-expr expr (type #:auto))
+#:auto-value empty-type)
 (define make/print-body (semantic-action-2 make-print-body)) 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;Expr;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-struct equals (left right))
+(define-struct equals (left right (type #:auto))
+#:auto-value empty-type)
 (define make/equals (semantic-action-2 make-equals))
 
-(define-struct less-than (left right))
+(define-struct less-than (left right (type #:auto))
+#:auto-value empty-type)
 (define make/less-than (semantic-action-2 make-less-than))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;Simple-Expr;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-struct addition (left right))
+(define-struct addition (left right (type #:auto))
+#:auto-value empty-type)
 (define make/addition (semantic-action-2 make-addition))
 
-(define-struct subtraction (left right))
+(define-struct subtraction (left right (type #:auto))
+#:auto-value empty-type)
 (define make/subtraction (semantic-action-2 make-subtraction))
 
-(define-struct or~ (left right))
+(define-struct or~ (left right (type #:auto))
+#:auto-value empty-type)
 (define make/or (semantic-action-2 make-or~))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;Term;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-struct multiplication (left right))
+(define-struct multiplication (left right (type #:auto))
+#:auto-value empty-type)
 (define make/multiplication (semantic-action-2 make-multiplication))
 
-(define-struct division (left right))
+(define-struct division (left right (type #:auto))
+#:auto-value empty-type)
 (define make/division (semantic-action-2 make-division))
 
-(define-struct and~ (left right))
+(define-struct and~ (left right (type #:auto))
+#:auto-value empty-type)
 (define make/and~ (semantic-action-2 make-and~))
 ;;;
 
-(define-struct negative-value (value))
+(define-struct negative-value (value (type #:auto))
+#:auto-value empty-type)
 (define make/negative-value (semantic-action-1 make-negative-value))
 
-(define-struct if~ (test then else))
+(define-struct if~ (test then else (type #:auto))
+#:auto-value empty-type)
 (define make/if~ (semantic-action-3 make-if~))
 
-(define-struct not (value))
+(define-struct not (value (type #:auto))
+#:auto-value empty-type)
 (define make/not (semantic-action-1 make-not))
 
-(define-struct boolean~ (value))
+(define-struct boolean~ (value (type #:auto))
+#:auto-value empty-type)
 (define make/boolean~ (semantic-no-pops make-boolean~))
 
-(define-struct number (value))
+;POTENTIAL PROBLEM WITH THIS NAME
+(define-struct number (value (type #:auto))
+#:auto-value empty-type)
 (define make/number (semantic-no-pops make-number))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;Actuals;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -154,11 +172,13 @@
 (define-struct empty-actuals ())
 (define make/empty-actuals (semantic-no-pops make-empty-actuals))
 
-(define-struct nonemptyactuals (expr))
+(define-struct nonemptyactuals (expr (type #:auto))
+#:auto-value empty-type)
 (define make/nonemptyactuals (semantic-action-1 make-nonemptyactuals))
 
 (define-struct nonemptyactuals-prime (expr nonemptyactuals))
 (define make/nonemptyactuals-prime (semantic-action-2 make-nonemptyactuals-prime))
 
-(define-struct function-call (name actuals))
+(define-struct function-call (name actuals (type #:auto))
+#:auto-value empty-type)
 (define make/function-call (semantic-action-2 make-function-call))
