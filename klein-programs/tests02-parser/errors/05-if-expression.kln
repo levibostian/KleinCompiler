@@ -1,0 +1,7 @@
+main(n : integer) : integer
+  if n < 10
+    2 * n
+  else
+    n - 10
+  endif
+

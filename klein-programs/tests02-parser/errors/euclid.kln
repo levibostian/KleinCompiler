@@ -1,7 +1,7 @@
 // Finds the GCD of two integers using Euclid's algorithm
 // based on a program by Chuck Hoffman
 
-remainder(a : integer, b : integer) : integer
+remainder(a : integer, b : integer)
    if a < b then
       a
    else

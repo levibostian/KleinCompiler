@@ -1,0 +1,4 @@
+a%z            // illegal char
+A_to_Z         // illegal char
+4294a67295     // embedded char
+

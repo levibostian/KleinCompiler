@@ -1,4 +1,6 @@
-// Andrew Howard
+// ported by Eugene Wallingford
+// from a program written in another language
+// by student Andrew Howard
 
 main( x:integer ):integer
   circularPrimesTo(x)
@@ -28,7 +30,7 @@ isCircularPrimeHelper(x:integer, turns:integer):boolean
   if turns=0 then
     true
   else
-    andy (
+    AND (
       isPrime(x),
       isCircularPrimeHelper( rotate(x), turns-1 )
     )//End and()
@@ -38,12 +40,8 @@ report(x:integer):boolean
   print(x)
   true
 
-andy(x:boolean, y:boolean):boolean
-  if x then
-    y
-  else
-    false
-  endif
+AND( p : boolean, q : boolean ) : boolean     // from Klein library
+    if p then q else false endif
 
 rotate(x:integer):integer
   add (

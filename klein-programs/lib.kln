@@ -1,17 +1,20 @@
 
-// This Klein library is a port of the MinimL library, a collection
+// This Klein library began as a port of the MinimL library, a collection
 // of utility routines written in MinimL for MinimL by MinimL creator
-// Doug Baldwin.  Note the convention that the names of library
-// functions are in all upper case letters, to help programmers avoid
-// defining conflicting names of their own).
+// Doug Baldwin.  Note the convention that the names of library functions
+// are in all upper case letters, to help programmers avoid defining
+// conflicting names of their own).
 
 // History:
 //   January  2002 -- MinimL library created by Doug Baldwin
 //   December 2007 -- Klein library ported by Eugene Wallingford
+//   October  2013 -- Klein library updated by Eugene Wallingford
 
-// This main function is required because our compiler spec
-// does not support separate compilation, of even compilation
-// of files without a main.
+// We include this main function because our language specification
+// requires one.  Otherwise, we would not be able to compile this
+// file and test its functions.  (Adding separate compilation of
+// a file of functions without a main would be an interesting
+// extension to Klein.)
 
 main( testArgument : integer ) : boolean
     print( SQRT(testArgument) )
@@ -19,17 +22,18 @@ main( testArgument : integer ) : boolean
 
 // --------------------------------------------------------------------
 // boolean functions
-//      We define even LT and EQ to give the operations precedence,
-//      in the absence of ()s as a grouping mechanism.
-
-AND( p : boolean, q : boolean ) : boolean
-    if p then q else false endif
+//      We define functions even for the primitive operators because,
+//      without ()s as a grouping mechanism, we need a way to force
+//      them to bind to specific arguments.
 
 LT( p : integer, q : integer ) : boolean
     p < q
 
 EQ( p : integer, q : integer ) : boolean
     p = q
+
+NE( p : integer, q : integer ) : boolean
+    not EQ(p, q)
 
 LE( p : integer, q : integer ) : boolean
     LT(p, q) or EQ(p, q)
@@ -40,10 +44,17 @@ GE( p : integer, q : integer ) : boolean
 GT( p : integer, q : integer ) : boolean
     not LE(p, q)
 
+OR( p : boolean, q : boolean ) : boolean
+    p or q
+
+AND( p : boolean, q : boolean ) : boolean
+    if p then q else false endif
+
 // --------------------------------------------------------------------
 // arithmetic functions
-//      We define functions even for the primitive operators to give
-//      them precedence, in the absence of ()s as a grouping mechanism.
+//      We define functions even for the primitive operators because,
+//      without ()s as a grouping mechanism, we need a way to force
+//      them to bind to specific arguments.
 
 PLUS( p : integer, q : integer ) : integer
     p + q
@@ -58,10 +69,13 @@ DIV( p : integer, q : integer ) : integer
     p / q
 
 NEG( n : integer ) : integer
-    0 - n
+    -n
 
 ABS( n : integer ) : integer
     if 0 < n then n else NEG(n) endif
+
+MOD( m : integer, n : integer ) : integer
+    m - m/n * n
 
 // --------------------------------------------------------------------
 // ODD  This is based on the idea that n = 2 * floor( n/2 ) only if

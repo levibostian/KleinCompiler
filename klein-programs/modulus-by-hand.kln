@@ -1,0 +1,11 @@
+mod(m : integer, n : integer) : integer
+  if m < n then
+     m
+  else
+     mod(m-n, n)
+  endif
+
+main(m : integer, n : integer) : integer
+  print( m / n )
+  print( mod(m,n) )
+  mod(m,n)
