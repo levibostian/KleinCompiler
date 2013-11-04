@@ -59,17 +59,21 @@
  
 
 /// Parser Execution:
+
+***NOTE: Use print-parser.rkt file for displaying the AST.
+parser.rkt produces the AST struct for you with:
+(parser <path-to-klein-program>)
+
+While print-parser.rkt displays the AST struct to you with:
+(printf (print/program (parser <path-to-klein-program>)))
+
 ***Must have racket language installed to execute parser.
    And path-ro-racket/bin/racket must also be located in $PATH variable.
 $ parse-to-ast <path-to-klein-source>
 
-If path-to-racket/bin/racket is not in your machine's $PATH 
-environment variable, run the parser with:
-$ <path-to-racket>/bin/racket parser.rkt <path-to-klein-source>
-
-User may also load parser.rkt source code file into DrRacket IDE
+User may also load print-parser.rkt source code file into DrRacket IDE
 ,click "Run", then at prompt of DrRacket, enter:
-> (parser <path-to-klein>)
+> (printf (print/program (parser <path-to-klein-program>)))
 
 <path-to-racket> is path on your machine where racket language is
    installed. 
