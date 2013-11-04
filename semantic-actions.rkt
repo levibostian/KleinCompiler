@@ -3,6 +3,9 @@
 (provide (all-defined-out))
 (require "parser-extra.rkt")
 
+(define op (open-output-string))
+(define get-op get-output-string)
+
 (define pop-2 (compose pop pop  ))
 (define pop-3 (compose pop pop-2))
 (define pop-4 (compose pop pop-3))
@@ -31,7 +34,8 @@
           (second stack)
           (first stack))))
 
-(define semantic-act
+
+(define semantic-action-with
   (lambda (make pop-amt amt-off-top)
     (lambda (stack value)
       (push (pop-amt stack)
@@ -39,16 +43,17 @@
                          (amt-off-top stack)))))))
 (define semantic-action-1
   (lambda (make)
-    (semantic-act make pop 1-off-top)))
+    (semantic-action-with make pop 1-off-top)))
 (define semantic-action-2
   (lambda (make) 
-    (semantic-act make pop-2 2-off-top)))
+    (semantic-action-with make pop-2 2-off-top)))
 (define semantic-action-3
   (lambda (make) 
-    (semantic-act make pop-3 3-off-top)))
+    (semantic-action-with make pop-3 3-off-top)))
 (define semantic-action-4
   (lambda (make) 
-    (semantic-act make pop-4 4-off-top)))
+    (semantic-action-with make pop-4 4-off-top)))
+
 (define semantic-no-pops
   (lambda (make)
     (lambda (stack value)
@@ -59,7 +64,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;Body;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-struct identifier (value))
+(define-struct identifier (value)
+  #:methods gen:custom-write
+  ((define (write-proc ident port mode)
+     (display (identifier-value ident) port))))
+   
 (define make/identifier (semantic-no-pops make-identifier))
 
 (define-struct program (definitions))
@@ -72,7 +81,9 @@
 (define make/def (semantic-action-4 make-def))
 
 (define-struct empty-formals ())
-(define make/empty-formals (semantic-no-pops make-empty-formals))
+(define make/empty-formals
+  (lambda (stack value)
+    (push stack (list (make-empty-formals)))))
 
 (define-struct nonemptyformals (formal nonemptyformals))
 (define make/nonemptyformals (semantic-action-2 make-nonemptyformals))
@@ -84,7 +95,7 @@
 (define make/type (semantic-no-pops make-type))
 
 (define-struct print~ (expr))
-(define make/print~ (semantic-action-1 make-print~)) 
+(define make/print~ (semantic-action-1 make-print~))
 
 (define-struct body (expr))
 (define make/body (semantic-action-1 make-body)) 
