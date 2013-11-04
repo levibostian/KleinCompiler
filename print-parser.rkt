@@ -18,7 +18,7 @@
           ((not? some-struct)            (print/not some-struct amt-of-spaces))
           ((negative-value? some-struct) (print/negative-value some-struct amt-of-spaces))
           ((function-call? some-struct)  (print/function-call some-struct amt-of-spaces))
-          ((or (nonemptyactuals? some-struct) 
+          ((or (nonemptyactuals? some-struct)
                (nonemptyactuals-prime? some-struct)) (print/actuals some-struct amt-of-spaces))
           ((identifier? some-struct)     (print/identifier some-struct "identifier" amt-of-spaces))
           ((addition? some-struct)       (print/addition some-struct amt-of-spaces))
@@ -48,8 +48,8 @@
     (string-append (indent amt-of-spaces)
                    "function\n"
                    (print/identifier (def-id def~) "name" (+ 4 amt-of-spaces))
-                   (indent (+ 4 amt-of-spaces))
-                   "parameters\n"
+;                   (indent (+ 4 amt-of-spaces))
+;                   "parameters\n"
                    (print/nonemptyformals (def-formals def~) (+ 4 amt-of-spaces))
                    (print/type (def-type def~) "returns" amt-of-spaces)
                    (print/body (def-body def~) (+ 4 amt-of-spaces)))))
@@ -63,12 +63,17 @@
 
 (define print/nonemptyformals 
   (lambda (nonempform amt-of-spaces)
-    (if (formal? nonempform)
-        (print/formal nonempform (+ 4 amt-of-spaces))
-        (string-append  
-                       (print/formal (nonemptyformals-formal nonempform) (+ 4 amt-of-spaces))
-                       (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) (+ 4 amt-of-spaces))))))
-
+    (cond ((formal? nonempform) (string-append (indent amt-of-spaces)
+                                               "parameters\n"
+                                               (print/formal nonempform (+ 4 amt-of-spaces))))
+          ((nonemptyformals? nonempform)(string-append  
+                                         (indent (+ 4 amt-of-spaces))
+                                         "parameters\n"
+                                         (print/formal (nonemptyformals-formal nonempform) (+ 4 amt-of-spaces))
+                                         (print/nonemptyformals-prime (nonemptyformals-nonemptyformals nonempform) (+ 4 amt-of-spaces))))
+          ((empty-formals? nonempform) (print/empty-formals nonempform amt-of-spaces))
+          (else (list "error - nonemptyformals" nonempform)))))
+  
 (define print/nonemptyformals-prime
   (lambda (nonempform amt-of-spaces)
     (if (formal? nonempform)
@@ -154,7 +159,6 @@
 
 (define print/or
   (lambda (or~ amt-of-spaces)
-    (display (or~-right or~))
     (string-append (indent amt-of-spaces)
                    "or_expression\n"
                    (print/term (or~-left or~) amt-of-spaces)
@@ -262,11 +266,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(display (print/program (parser "klein-programs/circular-prime.kln")))
+(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/test.kln")))
 ;(display (print/program (parser "klein-programs/euclid.kln")))
 ;(display (print/program (parser "klein-programs/horner.kln")))
-;(display (print/program (parser "klein-programs/circular-prime.kln")))
+(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/farey.kln")))
 ;(display (print/program (parser "klein-programs/fibonacci.kln")))
-(display (print/program (parser "klein-programs/horner-parameterized.kln")))
+;(display (print/program (parser "klein-programs/horner-parameterized.kln")))
