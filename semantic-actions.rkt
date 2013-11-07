@@ -3,7 +3,9 @@
 (provide (all-defined-out))
 (require "parser-extra.rkt")
 
-(define empty-type 'null)
+(define empty-type 'void)
+(define bool-type 'boolean)
+(define int-type  'integer)
 
 (define op (open-output-string))
 (define get-op get-output-string)
@@ -159,12 +161,12 @@
 (define make/not (semantic-action-1 make-not))
 
 (define-struct boolean~ (value (type #:auto))
-#:auto-value empty-type)
+#:auto-value bool-type)
 (define make/boolean~ (semantic-no-pops make-boolean~))
 
 ;POTENTIAL PROBLEM WITH THIS NAME
 (define-struct number (value (type #:auto))
-#:auto-value empty-type)
+#:auto-value int-type)
 (define make/number (semantic-no-pops make-number))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;Actuals;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

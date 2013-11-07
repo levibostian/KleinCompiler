@@ -2,6 +2,6 @@
 // based on a program by Chuck Hoffman
 
 main() : integer
-   1
+   print(1)
    
 
