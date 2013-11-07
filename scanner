@@ -1,6 +1,5 @@
-#!/bin/bash
+#lang racket
 
-# BASH scipt to execute Klein Scanner program. 
-set -e
+(require "scanner.rkt")
 
-racket scanner.rkt $1
+(scanner (vector-ref (current-command-line-arguments) 0))
