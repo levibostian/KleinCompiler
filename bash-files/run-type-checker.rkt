@@ -1,8 +1,9 @@
 #lang racket
 
-(require "../type-checker.rkt")
+(require "../type-checker.rkt"
+         "../parser.rkt")
 
 (define file-name
   (vector-ref (current-command-line-arguments) 0))
 
-(type-checker file-name)
+(semantic-analysis (parser file-name))
