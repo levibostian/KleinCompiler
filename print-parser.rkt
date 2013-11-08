@@ -1,7 +1,9 @@
 #lang racket
 
+(provide (all-defined-out))
 (require "semantic-actions.rkt"
          "parser.rkt")
+
 
 (define indent
   (lambda (amt-of-spaces)
@@ -55,7 +57,7 @@
                    (print/body (def-body def~) (+ 4 amt-of-spaces)))))
 (define print/identifier
   (lambda (ident name amt-of-spaces)
-    (string-append (indent amt-of-spaces) name "(" (symbol->string (identifier-value ident)) ")\n")))
+    (string-append (indent amt-of-spaces) name "(" (symbol->string (identifier-value ident)) ") -> " (symbol->string (identifier-type ident)) "\n")))
 
 (define print/empty-formals
   (lambda (formals amt-of-spaces)
@@ -96,19 +98,19 @@
 (define print/body
   (lambda (bod amt-of-spaces)
     (cond ((print-body? bod) (string-append (indent amt-of-spaces)
-                                            "body\n" 
+                                            "body -> " (symbol->string (print-body-type bod)) "\n" 
                                             (print/print~ (print-body-print-expr bod) (+ 4 amt-of-spaces))
                                             "\n"
                                             (print/body (print-body-expr bod) (+ 4 amt-of-spaces))))
           ((body? bod) (string-append (indent amt-of-spaces)
-                                      "body\n"
+                                      "body -> " (symbol->string (body-type bod)) "\n"
                                       (print/expr (body-expr bod) amt-of-spaces)))
           (else (list "error - body" bod)))))
 
 (define print/print~
   (lambda (prnt amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "print\n" 
+                   "print -> " (symbol->string (print~-type prnt)) "\n" 
                    (print/expr (print~-expr prnt) amt-of-spaces))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;EXPR;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,7 +121,7 @@
 (define print/less-than
   (lambda (less amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "less-than_expression\n"
+                   "less-than_expression -> " (symbol->string (less-than-type less)) "\n"
                    (print/simple-expr (less-than-left less) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "<\n"
@@ -128,7 +130,7 @@
 (define print/equals
   (lambda (eq amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "equals_expression\n" 
+                   "equals_expression -> " (symbol->string (equals-type eq)) "\n" 
                    (print/simple-expr (equals-left eq) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "=\n"
@@ -142,7 +144,7 @@
 (define print/addition
   (lambda (addi amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "addition_expression\n"
+                   "addition_expression -> " (symbol->string (addition-type addi)) "\n"
                    (print/term (addition-left addi) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "+\n"
@@ -151,7 +153,7 @@
 (define print/subtraction
   (lambda (sub amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "subtraction_expression\n"
+                   "subtraction_expression -> " (symbol->string (subtraction-type sub)) "\n"
                    (print/term (subtraction-left sub) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "-\n"
@@ -160,7 +162,7 @@
 (define print/or
   (lambda (or~ amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "or_expression\n"
+                   "or_expression -> " (symbol->string (or~-type or~)) "\n"
                    (print/term (or~-left or~) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "or\n"
@@ -173,7 +175,7 @@
 (define print/multiplication
   (lambda (multi amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "multiplication_expression\n"
+                   "multiplication_expression -> " (symbol->string (multiplication-type multi)) "\n"
                    (print/factor (multiplication-left multi) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "*\n"
@@ -181,7 +183,7 @@
 (define print/division
   (lambda (div amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "division_expression\n"
+                   "division_expression -> " (symbol->string (division-type div)) "\n"
                    (print/factor (division-left div) amt-of-spaces)
                    (indent (+ 4 amt-of-spaces))
                    "/\n"
@@ -189,7 +191,7 @@
 (define print/and
   (lambda (& amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "and_expression\n"
+                   "and_expression -> " (symbol->string (and~-type &)) "\n"
                    (print/factor (and~-left &) amt-of-spaces)
                    (indent amt-of-spaces)
                    "and\n"
@@ -203,13 +205,13 @@
 (define print/not
   (lambda (not~ amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "not_expression\n" 
+                   "not_expression -> " (symbol->string (not-type not~)) "\n" 
                    (print/factor (not-value not~) amt-of-spaces))))
 
 (define print/function-call
   (lambda (func-call amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "function_call\n" 
+                   "function_call -> " (symbol->string (function-call-type func-call)) "\n" 
                    (print/identifier (function-call-name func-call) "function_name" (+ 4 amt-of-spaces))
                    (print/actuals (function-call-actuals func-call) (+ 4 amt-of-spaces)))))
 
@@ -219,23 +221,23 @@
         (string-append (indent amt-of-spaces) 
                        "literal(" 
                        (symbol->string (boolean~-value lit)) 
-                       ")\n")
+                       ") -> " (symbol->string (boolean~-type lit)) "\n")
         (string-append (indent amt-of-spaces) 
                        "literal(" 
                        (symbol->string (number-value lit)) 
-                       ")\n"))))
+                       ") -> " (symbol->string (number-type lit)) "\n"))))
 
 (define print/negative-value
   (lambda (neg-val amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "negative_expression\n"
+                   "negative_expression -> " (symbol->string (negative-value-type neg-val)) "\n"
                    (print/factor (negative-value-value neg-val) (+ 4 amt-of-spaces))
                    "\n")))
 
 (define print/if~
   (lambda (iffy amt-of-spaces)
     (string-append (indent amt-of-spaces)
-                   "if_expression\n"
+                   "if_expression -> " (symbol->string (if~-type iffy)) "\n"
                    (indent (+ 4 amt-of-spaces))
                    "if\n"
                    (print/expr (if~-test iffy) (+ 4 amt-of-spaces))
@@ -266,11 +268,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/test.kln")))
 ;(display (print/program (parser "klein-programs/euclid.kln")))
 ;(display (print/program (parser "klein-programs/horner.kln")))
-(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/farey.kln")))
 ;(display (print/program (parser "klein-programs/fibonacci.kln")))
 ;(display (print/program (parser "klein-programs/horner-parameterized.kln")))

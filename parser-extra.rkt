@@ -93,13 +93,13 @@
 ;;;;;;;;;;;;;;;;;;;;Error-check;;;;;;;;;;;;;;;;;;;;
 (define print-error
   (lambda (token stack)
-    (if (end-of-file-token? token)
-        (list 'Compile 'abort. 'Source 'code 'file 'empty.)
+    ; (if (end-of-file-token? token)
+    ;     (list 'Compile 'abort. 'Source 'code 'file 'empty.)
         (list  'ERROR: 'with 
                (symbol->string (token-value token)) 
                'on 'column:  (token-col token) 
                'on 'row: (token-row token)
-               'stack: stack )) ))
+               'stack: stack )) )
 (define transition-error?
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )
