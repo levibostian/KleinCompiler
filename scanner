@@ -1,5 +1,1 @@
-#lang racket
-
-(require "scanner.rkt")
-
-(scanner (vector-ref (current-command-line-arguments) 0))
+racket bash-files/run-scanner.rkt $1
