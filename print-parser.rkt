@@ -4,7 +4,6 @@
 (require "semantic-actions.rkt"
          "parser.rkt")
 
-
 (define indent
   (lambda (amt-of-spaces)
     (make-string amt-of-spaces #\space)))

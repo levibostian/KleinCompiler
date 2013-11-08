@@ -1,0 +1,1 @@
+racket bash-files/run-type-checker.rkt $1

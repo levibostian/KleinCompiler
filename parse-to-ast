@@ -1,6 +1,1 @@
-#!/bin/bash
-
-# BASH scipt to execute Klein Parser to output abstract syntax tree. 
-set -e
-
-racket parser.rkt $1
+racket bash-files/run-print-parser.rkt $1
