@@ -38,4 +38,9 @@
   (lambda (function sym-table error-type)
     (member? function (hash-keys sym-table))))
 
-        
+(define no-user-defined-print?
+  (lambda (sym-table)
+    (if (member? 'print (hash-keys sym-table))
+        #f
+        #t)))
+ 

@@ -9,8 +9,9 @@
  //  endif )
  //  1
 
-main() : integer
-   test( 1, true)
 
-test( a: integer, b : boolean) : integer
-   1
+
+main() : integer
+   x
+main() : boolean
+true

@@ -45,5 +45,3 @@
 ;  function-name3:
 ;  {...}
 ;}
-
-;(make-hash (list (cons 'main (make-hash (list (cons "parameters" (make-hash (list (cons 'x 'int) (cons 'y 'bool)))) (cons 'num-of 2) (cons 'type 'int))))))
