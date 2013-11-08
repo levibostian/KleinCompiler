@@ -15,7 +15,7 @@
           ((nonemptyformals? ast) (append (symbol-table (nonemptyformals-formal ast))
                                           (symbol-table (nonemptyformals-nonemptyformals ast))))
           ((formal? ast) (list (cons (identifier-value (formal-id ast)) (type-value (formal-type ast)))))
-          ((empty-formals? ast) 'null)
+          ((empty-formals? ast) (list (cons '**null** '**null**)))
           (else (display "ERROR WITH SYMBOL-TABLE, NOTHING MATCHED")
                 (display ast)) )))
 
@@ -30,6 +30,16 @@
       ((formal? some-formals) (+ 1 amt))
       ((empty-formals? some-formals) 0)
       (else (display "PROBLEM WITH amt-of-params-for-helper")))))
+
+(define test (symbol-table (parser "klein-programs/test.kln")))
+
+(define lookup-error-param
+  (lambda (param function)
+    (list 'param: param 'does 'not 'exist 'for 'function: function)))
+
+(define get-id-type-for-def
+  (lambda (ident function sym-table error-type)
+    (hash-ref (hash-ref (hash-ref sym-table function) 'parameters) ident error-type)))
 
 
 ;{ 

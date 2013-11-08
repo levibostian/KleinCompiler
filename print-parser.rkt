@@ -267,11 +267,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; (display (print/program (parser "klein-programs/circular-prime.kln")))
-;(display (print/program (type-check (parser "klein-programs/test.kln"))))
-;(display (print/program (parser "klein-programs/euclid.kln")))
-;(display (print/program (parser "klein-programs/horner.kln")))
-; (display (print/program (parser "klein-programs/circular-prime.kln")))
-;(display (print/program (parser "klein-programs/farey.kln")))
-;(display (print/program (parser "klein-programs/fibonacci.kln")))
-;(display (print/program (parser "klein-programs/horner-parameterized.kln")))
+(display (print/program (parser "klein-programs/circular-prime.kln")))
+(display (print/program (parser "klein-programs/test.kln")))
+(display (print/program (parser "klein-programs/euclid.kln")))
+(display (print/program (parser "klein-programs/horner.kln")))
+(display (print/program (parser "klein-programs/circular-prime.kln")))
+(display (print/program (parser "klein-programs/farey.kln")))
+(display (print/program (parser "klein-programs/fibonacci.kln")))
+(display (print/program (parser "klein-programs/horner-parameterized.kln")))
