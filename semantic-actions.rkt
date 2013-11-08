@@ -4,6 +4,7 @@
 (require "parser-extra.rkt")
 
 (define empty-type 'void)
+(define print-type 'null)
 (define bool-type 'boolean)
 (define int-type  'integer)
 (define int/bool-type 'integer/boolean)

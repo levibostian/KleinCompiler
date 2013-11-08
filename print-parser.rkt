@@ -1,8 +1,9 @@
 #lang racket
 
+(provide (all-defined-out))
 (require "semantic-actions.rkt"
-         "parser.rkt"
-         "type-checker.rkt")
+         "parser.rkt")
+
 
 (define indent
   (lambda (amt-of-spaces)
@@ -56,7 +57,7 @@
                    (print/body (def-body def~) (+ 4 amt-of-spaces)))))
 (define print/identifier
   (lambda (ident name amt-of-spaces)
-    (string-append (indent amt-of-spaces) name "(" (symbol->string (identifier-value ident)) ")\n")))
+    (string-append (indent amt-of-spaces) name "(" (symbol->string (identifier-value ident)) ") -> " (symbol->string (identifier-type ident)) "\n")))
 
 (define print/empty-formals
   (lambda (formals amt-of-spaces)
@@ -267,11 +268,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(display (print/program (parser "klein-programs/circular-prime.kln")))
-(display (print/program (parser "klein-programs/test.kln")))
-(display (print/program (parser "klein-programs/euclid.kln")))
-(display (print/program (parser "klein-programs/horner.kln")))
-(display (print/program (parser "klein-programs/circular-prime.kln")))
-(display (print/program (parser "klein-programs/farey.kln")))
-(display (print/program (parser "klein-programs/fibonacci.kln")))
-(display (print/program (parser "klein-programs/horner-parameterized.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/test.kln")))
+;(display (print/program (parser "klein-programs/euclid.kln")))
+;(display (print/program (parser "klein-programs/horner.kln")))
+;(display (print/program (parser "klein-programs/circular-prime.kln")))
+;(display (print/program (parser "klein-programs/farey.kln")))
+;(display (print/program (parser "klein-programs/fibonacci.kln")))
+;(display (print/program (parser "klein-programs/horner-parameterized.kln")))
