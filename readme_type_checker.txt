@@ -11,10 +11,16 @@
    
 /// Design of Solution:
 1. Symbol table implemented as a Racket hash table. 
+   Maps all identifiers found (function calls, function definitions,
+   function parameters, function variables) with it's type to
+   easily retrieve later in type checker.
 2. Our type checker function implemented through struct 
-   comparison. Each struct type re-created into a new struct
-   containing it's data type. 
+   comparison. Each struct type is re-created into a new struct
+   containing a new field for the data type. 
 
+***Note:
+Printer for type checker prints 'void' for identifiers not located
+inside of the body of a function. 
 
 /// Parser Execution:
 ***Must have racket language installed to execute parser.
@@ -96,3 +102,9 @@ scanner-unit-testing.rkt
    RackUnit unit tests created for scanner
 semantic-actions.rkt
    Contains Racket structs used to represent semantic actions. 
+symbol-table.rkt
+   Racket source file responsible for creating hash symbol. 
+symbol-table-helpers.rkt
+   Helper functions dealing with symbol table implementation. 
+type-checker.rkt
+   Racket source file responsible for type checking. 
