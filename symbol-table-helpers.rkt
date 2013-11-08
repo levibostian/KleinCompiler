@@ -1,7 +1,8 @@
 #lang racket
 
 (provide (all-defined-out))
-(require "semantic-actions.rkt")
+(require "semantic-actions.rkt"
+         "data-types.rkt")
 
 (define amt-of-params-for
   (lambda (some-formals)
@@ -29,4 +30,12 @@
 
 (define get-function-type
   (lambda (function sym-table error-type)
-    (hash-ref (hash-ref sym-table function) 'type)))
+    (if (member? function (hash-keys sym-table))
+        (hash-ref (hash-ref sym-table function) 'type)
+        error-type)))
+    
+(define valid-function?
+  (lambda (function sym-table error-type)
+    (member? function (hash-keys sym-table))))
+
+        

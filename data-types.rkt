@@ -13,7 +13,7 @@
 (define empty-char "")
 (define operators          (list "+" "-" "/" "*" "<" "="))
 (define whitespace         (list " " "\r" "\n" "\r\n" "\t"))
-(define type               (list "integer" "boolean"))
+(define type~               (list "integer" "boolean"))
 (define boolean            (list "true" "false"))
 (define math-operator      (list "+" "-" "*" "/"))
 (define comparator         (list "<" "="))
@@ -37,7 +37,7 @@
 
 (define keyword?
   (lambda (item)
-    (or (member? item type)
+    (or (member? item type~)
         (member? item boolean)
         (member? item conditional)
         (member? item boolean-connective)
