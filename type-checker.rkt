@@ -11,6 +11,7 @@
          "parser.rkt")
 
 (define type-err 'TYPE-ERROR)
+(define error-ast? list?)
 
 ;(define symbol-table-output (symbol-table (parser "klein-programs/test.kln")));REMEMBER TO CHANGE
 ;(define abstract-st (parser "klein-programs/test.kln"))
@@ -41,10 +42,12 @@
 
 (define semantic-analysis
   (lambda (ast)
-    (let ((sym-table (symbol-table ast)))
-      (if (no-user-defined-print? sym-table)
-          (type-check-helper ast 'nothing (symbol-table ast))
-          "Error: cannot overwrite print"))))
+    (if (error-ast? ast)
+        ast
+        (let ((sym-table (symbol-table ast)))
+          (if (no-user-defined-print? sym-table)
+              (type-check-helper ast 'nothing (symbol-table ast))
+              "Error: cannot overwrite print")))))
               
       
 
