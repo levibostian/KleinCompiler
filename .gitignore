@@ -5,3 +5,6 @@ compiled/
 
 # ignore files by LibreOffice
 .~lock.*
+
+# mac stuff
+*DS_Store*
