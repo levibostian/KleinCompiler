@@ -3,6 +3,10 @@
 (provide (all-defined-out))
 (require "semantic-actions.rkt"
          "data-types.rkt")
+(define symbol-table-lookup
+  (lambda (function-name)
+    (lambda (symbol-table) 
+      (hash-ref symbol-table function-name))))
 
 (define amt-of-params-for
   (lambda (some-formals)
