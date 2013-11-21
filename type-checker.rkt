@@ -101,6 +101,8 @@
           ((boolean~? exp)        (boolean~-type        exp))
           ((body? exp)            (body-type            exp))
           ((identifier? exp)      (identifier-type      exp))
+          ((print~? exp)          (print~-type          exp))
+          ((print-body? exp)      (print-body-type      exp))
           (else (display "ERROR WITH get-type")
                 (display exp);should never reach
                 "ERROR") )))
