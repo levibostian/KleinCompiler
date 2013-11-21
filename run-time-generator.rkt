@@ -32,7 +32,7 @@
            
 ;(define generate-def 
 ;  (lambda ()))
-
+           
 (define generate ; make sure to check for errors from AST
   (lambda (ast)  ; find way to keep track of top of call stack
     (let ((symbol-table (symbol-table ast)))
@@ -64,7 +64,7 @@
                     ((number? ast)      (append (generate-number (number-value ast) top-of-call-stack line-num)))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
                     ))))
-        (printf (create-tm-string (generate-everything ast 1 0) symbol-table)) ))));check for parser error
+        (printf (create-tm-string (generate-everything ast 1 0) symbol-table))) )));check for parser error
 
 (define generate-print
   (lambda (tm-print-code line-num top-of-call-stack)
@@ -85,9 +85,16 @@
                       list-of-tm-lines) 
                  "")))
   
+(define write-out
+  (lambda (file-name tm-file-name)
+    (with-output-to-file tm-file-name
+      (lambda () (generate (semantic-analysis (parser file-name))))
+      #:exists 'replace)))
 
-
+(write-out "klein-programs/08-print.kln" "08-print.tm")
 ;(generate (semantic-analysis (parser "klein-programs/08-print.kln")))
+
+
 
   
   
