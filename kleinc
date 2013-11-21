@@ -1,1 +1,3 @@
-racket bash-files/run-code-generator.rkt $1
+FIL_NAME='echo $1 | cut -d'.' --complement -f2-
+
+racket bash-files/run-code-generator.rkt $1 $FIL_NAME.tm
