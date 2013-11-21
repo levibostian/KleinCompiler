@@ -21,8 +21,8 @@
                           (string-append (number->string (+ 1 line-num)) ":  ST 6,1(0)\n")
                           (list (string-append (number->string (+ 2 line-num)) ": LDA 7,~a(0)\n")
                                 (symbol-table-lookup 'main)) ; note this for future reference for functions
-                          (string-append (number->string (+ 3 line-num)) ":  LD 2,2(0)\n")
-                          (string-append (number->string (+ 4 line-num)) ": OUT 2,0,0\n" )
+                          (string-append (number->string (+ 3 line-num)) ":  LD 3,2(0)\n")
+                          (string-append (number->string (+ 4 line-num)) ": OUT 3,0,0\n" )
                           (string-append (number->string (+ 5 line-num)) ":HALT 0,0,0\n" ) ))))))
                    
 (define generate-number
@@ -33,7 +33,7 @@
 ;(define generate-def 
 ;  (lambda ()))
 
-(define generate
+(define generate ; make sure to check for errors from AST
   (lambda (ast)
     (let ((symbol-table (symbol-table ast)))
       (letrec ((generate-everything
@@ -44,12 +44,15 @@
                                             (append generated-runtime
                                                     (generate-everything (program-definitions ast) (+ top-of-call-stack 1) line-num)))))
                     ((definitions? ast) (let ((generated-def (generate-everything (definitions-def ast) top-of-call-stack line-num)))
-                                          (let ((line-num (length generated-def)))
+                                          (let ((line-num (+ line-num (length generated-def))))
                                             (append generated-def
                                                     (generate-everything (definitions-definitions ast) top-of-call-stack line-num)))))
-                    ((def? ast)         (hash-set! (hash-ref symbol-table (identifier-value (def-id ast))) 'tm-line line-num)
-                                        (append (list "* MAIN STARTS HERE\n") ; add def to symbol table, branch number
-                                                (generate-everything (def-body ast) top-of-call-stack line-num))) ; use the let implementation to find out length of whole function
+                    ((def? ast)         (let ((generated-body (generate-everything (def-body ast) top-of-call-stack line-num)))
+                                          (let ((line-num-after-body (+ line-num (length generated-body))))          
+                                            (hash-set! (hash-ref symbol-table (identifier-value (def-id ast))) 'tm-line line-num)
+                                            (append (list (string-append "* " (symbol->string (identifier-value (def-id ast))) "\n")) ; add def to symbol table, branch number
+                                                    generated-body
+                                                    (list (string-append (number->string line-num-after-body) ": LDA 7,0(6)\n")))))) ; use the let implementation to find out length of whole function
                     ((body? ast)        (append (generate-everything (body-expr ast) top-of-call-stack line-num)))
                     ((number? ast)      (append (generate-number (number-value ast) top-of-call-stack line-num)))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast)) 
@@ -66,8 +69,12 @@
 (define create-tm-string
   (lambda (list-of-tm-lines symbol-table)
     (string-join (map (eval-tm-lines symbol-table)
-                      list-of-tm-lines))))
+                      list-of-tm-lines) 
+                 "")))
   
-  
+
+
+(generate (semantic-analysis (parser "klein-programs/08-print.kln")))
+
   
   
