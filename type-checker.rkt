@@ -42,7 +42,7 @@
 
 (define semantic-analysis
   (lambda (ast)
-    (if (error-ast? ast)
+    (if (error-ast? ast);shorten up to catch all errors ( including a user defining their own print )
         ast
         (let ((sym-table (symbol-table ast)))
           (if (no-user-defined-print? sym-table)
