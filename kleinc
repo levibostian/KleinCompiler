@@ -1,0 +1,1 @@
+racket bash-files/run-code-generator.rkt $1
