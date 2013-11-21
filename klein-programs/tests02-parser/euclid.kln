@@ -1,0 +1,22 @@
+// Finds the GCD of two integers using Euclid's algorithm
+// based on a program by Chuck Hoffman
+
+remainder(a : integer, b : integer) : integer
+   if a < b then
+      a
+   else
+      remainder(a-b, b)
+   endif
+
+
+gcd(a : integer, b : integer) : integer
+   if b = 0 then
+      a
+   else
+      gcd(b, remainder(a, b))
+   endif
+
+
+main(a : integer, b : integer) : integer
+   gcd(a,b)
+

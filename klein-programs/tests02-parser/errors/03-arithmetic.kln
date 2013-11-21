@@ -1,0 +1,3 @@
+main(n : integer) : integer
+  n ** 1
+

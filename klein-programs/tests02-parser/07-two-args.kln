@@ -1,0 +1,10 @@
+main(n : integer) : integer
+  if f(n+1,n) = 3*n+2 then
+    n
+  else
+    0
+  endif
+
+f(m : integer, n : integer) : integer
+  2 * m + n
+

@@ -1,0 +1,44 @@
+main( n : integer ) : boolean
+  printAndReturn( divisible(n) )
+
+divisible( n : integer ) : boolean
+  divisibleByParts( n / 10 , MOD(n, 10) )
+
+divisibleByParts( left : integer, right : integer ) : boolean
+  divisibleByDifference( left - right * 2 )
+
+divisibleByDifference( diff : integer ) : boolean
+  if OR( diff = 0, diff = 7, diff = -7) then
+     true
+  else
+     if diff < 14 then
+        false
+     else
+        divisible(diff)
+     endif
+  endif
+
+// --------------------------------
+// recurring utilities from lib.kln
+// --------------------------------
+
+MOD( m : integer, n : integer ) : integer
+  m - m/n * n
+
+
+OR( p : boolean,              // I extended OR to
+    q : boolean,              // take three arguments
+    r : boolean ) : boolean
+  if p or q
+     then true
+     else r
+     endif
+
+// ----------------------------------------------
+// a method I often use to implement main methods
+// ----------------------------------------------
+
+printAndReturn( bool : boolean ) : boolean
+  print( bool )
+  bool
+
