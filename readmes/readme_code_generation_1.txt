@@ -20,6 +20,35 @@
    are created before function call. After all TM code is generated,
    list of TM code is walked down and filled in with appropriate 
    integer return address values from the embedded functions in the list.
+   
+///Layout of Memory
+In some of our pictures you'll see the layout of our registers. We decided 
+to use this layout because it seems to work. Having r6 as our return address
+seems to work well so far, and we assumed that in the next step we will require
+two registers for arithmetic. We have one register dedicated to loading
+constants, and then one dedicated to accessing our data memory. In the future
+we may need to use r5 to keep track of the top of data memory. r5 was left
+open.
+
+///Layout of Stack Frames
+Again, we'll have a picutre of what they look like. Essentially we're
+only going to have a slot for Return value, Arguments, Return Address,
+and Temp objects. At the moment this seems like enough.  
+
+Since we only had to compile this simple program we don't have 
+data memory completely worked out, but what we intend is to set args,
+get return values, etc..will be done with offsets of the top of 
+the call stack. 
+
+Because we are keeping track of the top of the call stack we can
+compute offsets within a stack frame fairly easily. As for computing 
+offsets across stack frames, all we need to know is the return value. 
+We can compute that easily by just adding 1 to the top of the call stack
+and LD'ing that value into a register.
+
+There is still work to be done with how we're managing our stack frames
+in data memory and maybe that's not fully outlined here, but we are confident
+that we can get it working.
 
 /// Parser Execution:
 ***Must have racket language installed to execute parser.
