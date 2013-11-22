@@ -1,12 +1,11 @@
 #lang racket
 
+(provide (all-defined-out))
 (require "type-checker.rkt"
          "parser.rkt"
          "semantic-actions.rkt"
          "symbol-table.rkt"
          "symbol-table-helpers.rkt")
-
-(semantic-analysis (parser "klein-programs/08-print.kln"))
 
 (define generate-function-args 
   (lambda (line-num)
@@ -91,7 +90,7 @@
       (lambda () (generate (semantic-analysis (parser file-name))))
       #:exists 'replace)))
 
-(write-out "klein-programs/08-print.kln" "08-print.tm")
+;(write-out "klein-programs/08-print.kln" "08-print.tm")
 ;(generate (semantic-analysis (parser "klein-programs/08-print.kln")))
 
 
