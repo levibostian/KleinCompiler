@@ -31,13 +31,13 @@ we may need to use r5 to keep track of the top of data memory. r5 was left
 open.
 
 ///Layout of Stack Frames
-Again, we'll have a picutre of what they look like. Essentially we're
+Again, we'll have a picture of what they look like. Essentially we're
 only going to have a slot for Return value, Arguments, Return Address,
 and Temp objects. At the moment this seems like enough.  
 
 Since we only had to compile this simple program we don't have 
 data memory completely worked out, but what we intend is to set args,
-get return values, etc..will be done with offsets of the top of 
+get return values, etc. will be done with offsets of the top of 
 the call stack. 
 
 Because we are keeping track of the top of the call stack we can
