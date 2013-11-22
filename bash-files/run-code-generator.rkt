@@ -1,8 +1,6 @@
 #lang racket
 
-(require "../type-checker.rkt"
-         "../parser.rkt"
-         "../run-time-generator.rkt")
+(require "../run-time-generator.rkt")
 
 (define file-name
   (vector-ref (current-command-line-arguments) 0))
@@ -10,4 +8,3 @@
   (vector-ref (current-command-line-arguments) 1))
 
 (write-out file-name tm-file-name)
-;(generate (semantic-actions (parser file-name)) tm-file-name)
