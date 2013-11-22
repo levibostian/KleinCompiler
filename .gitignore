@@ -8,3 +8,8 @@ compiled/
 
 # mac stuff
 *DS_Store*
+
+# ignore .tm files as they are generated lots from us...
+# must force add them to include them in repo:
+# git add -f <tm-file-name>
+*.tm
