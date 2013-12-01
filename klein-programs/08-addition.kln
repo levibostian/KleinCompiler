@@ -1,0 +1,2 @@
+main() : boolean
+  not false
