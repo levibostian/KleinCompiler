@@ -1,2 +1,5 @@
-main() : boolean
-  not false
+test() : integer 
+  1
+
+main(a : integer, b : integer) : boolean
+  a + b

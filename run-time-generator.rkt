@@ -12,12 +12,12 @@
     '()))
 
 (define generate-runtime
-  (lambda (line-num)
+  (lambda (line-num symbol-table)
     (let ((generated-args (generate-function-args line-num)))
       (let ((line-num (length (generate-function-args line-num))))
             (append (generate-function-args line-num)
                     (list (string-append (number->string line-num)       ": LDA 6,3(7)\n")
-                          (string-append (number->string (+ 1 line-num)) ": LDC 5,0(0)\n")
+                          (string-append (number->string (+ 1 line-num)) (format ": LDC 5,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table 'main) 'amt-of-params))))
                           (string-append (number->string (+ 2 line-num)) ": LDC 4,1(0)\n")
                           (list (string-append (number->string (+ 3 line-num)) ": LDA 7,~a(0)\n")
                                 (symbol-table-lookup 'main)) ; note this for future reference for functions
@@ -29,86 +29,109 @@
   (lambda (ast)  ; find way to keep track of top of call stack
     (let ((symbol-table (symbol-table ast)))
       (letrec ((generate-everything
-                (lambda (ast top-of-call-stack line-num)
+                (lambda (ast cur-func-name line-num)
                   (cond 
-                    ((program? ast)     (let ((generated-runtime (generate-runtime line-num)))
+                    ((program? ast)     (let ((generated-runtime (generate-runtime line-num symbol-table)))
                                           (let ((line-num (length generated-runtime)))
                                             (append generated-runtime
-                                                    (generate-everything (program-definitions ast) (+ top-of-call-stack 1) line-num)))))
-                    ((definitions? ast) (let ((generated-def (generate-everything (definitions-def ast) top-of-call-stack line-num)))
+                                                    (generate-everything (program-definitions ast) (+ cur-func-name 1) line-num)))))
+                    ((definitions? ast) (let ((generated-def (generate-everything (definitions-def ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-def))))
                                             (append generated-def
-                                                    (generate-everything (definitions-definitions ast) top-of-call-stack line-num)))))
-                    ((def? ast)         (let ((generated-body (generate-everything (def-body ast) top-of-call-stack (+ 1 line-num))))
-                                          (let ((line-num-after-body (+ (+ 1 line-num) (length generated-body))))          
+                                                    (generate-everything (definitions-definitions ast) cur-func-name line-num)))))
+                    ((def? ast)         (let ((generated-body (generate-everything (def-body ast) 
+                                                                                   (identifier-value (def-id ast))
+                                                                                   (+ 3 line-num))))
+                                          (let ((line-num-after-body (+ (+ 3 line-num) (length generated-body))))          
                                             (hash-set! (hash-ref symbol-table (identifier-value (def-id ast))) 'tm-line line-num)
                                             (append (list (string-append "* " (symbol->string (identifier-value (def-id ast))) "\n")) ; add def to symbol table, branch number
-                                                    (list (string-append (number->string line-num) ": ADD 3,5,0\n"))
+                                                    (list (string-append (number->string line-num)       ": ADD 3,5,0\n"))
+                                                    (list (string-append (number->string (+ 1 line-num)) (format ": LDC 1,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table (identifier-value (def-id ast))) 'amt-of-params)))))
+                                                    (list (string-append (number->string (+ 2 line-num)) ": SUB 3,3,1\n"))
                                                     generated-body
                                                     (list (string-append (number->string line-num-after-body) ":  ST 1,0(3)\n"))
                                                     (list (string-append (number->string (+ 1 line-num-after-body)) ": ADD 5,3,0\n"))
                                                     (list (string-append (number->string (+ 2 line-num-after-body)) ": LDA 7,0(6)\n")))))) ; use the let implementation to find out length of whole function
-                    ((print-body? ast)  (let ((generated-print-expr (generate-everything (print-body-print-expr ast) top-of-call-stack line-num)))
+                    ((print-body? ast)  (let ((generated-print-expr (generate-everything (print-body-print-expr ast) cur-func-name line-num)))
                                           (let ((line-num-after-print-expr (+ line-num (length generated-print-expr))))
-                                            (let ((generated-print (generate-print generated-print-expr line-num-after-print-expr top-of-call-stack)))
+                                            (let ((generated-print (generate-print generated-print-expr line-num-after-print-expr cur-func-name)))
                                               (let ((line-num-after-print (+ line-num (length generated-print))))
                                                 (append  generated-print
-                                                         (generate-everything (print-body-expr ast) top-of-call-stack line-num-after-print)))))))
-                    ((body? ast)        (append (generate-everything (body-expr ast) top-of-call-stack line-num)))
-                    ((print~? ast)      (append (generate-everything (print~-expr ast) top-of-call-stack line-num)))
-                    ((addition? ast)    (let ((generated-left-expr (generate-everything (addition-left ast) top-of-call-stack line-num)))
+                                                         (generate-everything (print-body-expr ast) cur-func-name line-num-after-print)))))))
+                    ((body? ast)        (append (generate-everything (body-expr ast) cur-func-name line-num)))
+                    ((print~? ast)      (append (generate-everything (print~-expr ast) cur-func-name line-num)))
+                    ((addition? ast)    (let ((generated-left-expr (generate-everything (addition-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (addition-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (addition-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-addition generated-left-expr generated-right-expr line-num))))))
-                    ((subtraction? ast) (let ((generated-left-expr (generate-everything (subtraction-left ast) top-of-call-stack line-num)))
+                    ((subtraction? ast) (let ((generated-left-expr (generate-everything (subtraction-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (subtraction-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (subtraction-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-subtraction generated-left-expr generated-right-expr line-num))))))
-                    ((multiplication? ast) (let ((generated-left-expr (generate-everything (multiplication-left ast) top-of-call-stack line-num)))
+                    ((multiplication? ast) (let ((generated-left-expr (generate-everything (multiplication-left ast) cur-func-name line-num)))
                                              (let ((line-num (+ line-num (length generated-left-expr))))
-                                               (let ((generated-right-expr (generate-everything (multiplication-right ast) top-of-call-stack line-num)))
+                                               (let ((generated-right-expr (generate-everything (multiplication-right ast) cur-func-name line-num)))
                                                  (let ((line-num (+ line-num (length generated-right-expr))))
                                                    (generate-multiplication generated-left-expr generated-right-expr line-num))))))
-                    ((division? ast)    (let ((generated-left-expr (generate-everything (division-left ast) top-of-call-stack line-num)))
+                    ((division? ast)    (let ((generated-left-expr (generate-everything (division-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (division-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (division-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-division generated-left-expr generated-right-expr line-num))))))
-                    ((negative-value? ast) (let ((generated-neg-val-expr (generate-everything (negative-value-value ast) top-of-call-stack line-num)))
+                    ((negative-value? ast) (let ((generated-neg-val-expr (generate-everything (negative-value-value ast) cur-func-name line-num)))
                                              (let ((line-num (+ line-num (length generated-neg-val-expr))))
                                                (generate-negative-value generated-neg-val-expr line-num))))
-                    ((and~? ast)        (let ((generated-left-expr (generate-everything (and~-left ast) top-of-call-stack line-num)))
+                    ((and~? ast)        (let ((generated-left-expr (generate-everything (and~-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (and~-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (and~-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-and~ generated-left-expr generated-right-expr line-num))))))
-                    ((or~? ast)         (let ((generated-left-expr (generate-everything (or~-left ast) top-of-call-stack line-num)))
+                    ((or~? ast)         (let ((generated-left-expr (generate-everything (or~-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (or~-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (or~-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-or~ generated-left-expr generated-right-expr line-num))))))
-                    ((equals? ast)      (let ((generated-left-expr (generate-everything (equals-left ast) top-of-call-stack line-num)))
+                    ((equals? ast)      (let ((generated-left-expr (generate-everything (equals-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (equals-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (equals-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-equals generated-left-expr generated-right-expr line-num))))))
-                    ((less-than? ast)   (let ((generated-left-expr (generate-everything (less-than-left ast) top-of-call-stack line-num)))
+                    ((less-than? ast)   (let ((generated-left-expr (generate-everything (less-than-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-right-expr (generate-everything (less-than-right ast) top-of-call-stack line-num)))
+                                            (let ((generated-right-expr (generate-everything (less-than-right ast) cur-func-name line-num)))
                                               (let ((line-num (+ line-num (length generated-right-expr))))
                                                 (generate-less-than generated-left-expr generated-right-expr line-num))))))
-                    ((not? ast)         (let ((generated-not-expr (generate-everything (not-value ast) top-of-call-stack line-num)))
-                                             (let ((line-num (+ line-num (length generated-not-expr))))
-                                               (generate-not generated-not-expr line-num))))
-                    ((number? ast)      (append (generate-number (number-value ast) top-of-call-stack line-num)))
-                    ((boolean~? ast)    (append (generate-boolean (boolean~-value ast) top-of-call-stack line-num)))
-                    ((if~? ast)         (let ((generated-test-expr (generate-everything (if~-test ast) top-of-call-stack line-num)))
-                                          (let ((line-num (+ line-num (length generated-left-expr))))
-                                            (let ((generated-then-expr (generate-everything (if~-then ast) top-of-call-stack line-num)))
-                                              (let ((line-num (+ line-num (length generated-right-expr))))
-                                                (let ((generated-else-expr (generate-everything (if~-else ast) top-of-call-stack line-num)))
+                    ((not? ast)         (let ((generated-not-expr (generate-everything (not-value ast) cur-func-name line-num)))
+                                          (let ((line-num (+ line-num (length generated-not-expr))))
+                                            (generate-not generated-not-expr line-num))))
+                    ((number? ast)      (append (generate-number (number-value ast) cur-func-name line-num)))
+                    ((boolean~? ast)    (append (generate-boolean (boolean~-value ast) cur-func-name line-num)))
+                    ((identifier? ast)  (append (generate-identifier (identifier-value ast) cur-func-name line-num (hash-ref symbol-table cur-func-name))))
+                    ((if~? ast)         (let ((generated-test-expr (generate-everything (if~-test ast) cur-func-name line-num)))
+                                          (let ((line-num (+ line-num (length generated-test-expr))))
+                                            (let ((generated-test-expr (append generated-test-expr
+                                                                               (list (lambda (offset) 
+                                                                                       (string-append (number->string line-num) (format ": JEQ 1,~a(7)\n" offset)))))))
+                                              (let ((line-num (+ line-num 1)))
+                                                (let ((generated-then-expr (generate-everything (if~-then ast) cur-func-name line-num)))
+                                                  (let ((line-num (+ line-num (length generated-then-expr))))
+                                                    (let ((generated-then-expr (append generated-then-expr
+                                                                                       (list (lambda (offset) 
+                                                                                               (string-append (number->string line-num) (format ": JEQ 0,~a(7)\n" offset)))))))
+                                                      (let ((length-then (length generated-then-expr)))
+                                                        (let ((line-num (+ line-num 1)))
+                                                          (let ((generated-else-expr (generate-everything (if~-else ast) cur-func-name line-num)))
+                                                            (let ((line-num (+ line-num (length generated-else-expr))))
+                                                              (let ((length-else (length generated-else-expr)))
+                                                                (generate-if generated-test-expr 
+                                                                             generated-then-expr 
+                                                                             generated-else-expr 
+                                                                             line-num
+                                                                             length-then
+                                                                             length-else))))))))))))))
+                    ;((function-call? ast)  
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
                     ))))
         (printf (create-tm-string (generate-everything ast 1 0) symbol-table))) )));check for parser error
@@ -263,9 +286,40 @@
                   (string-append (number->string (+ 7 line-num))  ": LDC 1,0(0)\n" )
                   (string-append (number->string (+ 8 line-num))  ": ADD 5,4,5\n"  ) ))))
 
+(define fillin-offset
+  (lambda (offset)
+    (lambda (item)
+      (if (procedure? item)
+          (item offset)
+          item))))
+(define generate-if
+  (lambda (test then else line-num len-then len-else)
+    (append (map (fillin-offset len-then) test)
+            (map (fillin-offset len-else) then)
+            else)))
+
+(define find-pos-of-item-in-list
+  (lambda (item lyst)
+    (find-pos-of-item-in-list-helper item lyst 1)))
+(define find-pos-of-item-in-list-helper
+  (lambda (item lyst accum)
+    (if (or (null? lyst) (eq? item (car lyst)))
+        accum
+        (find-pos-of-item-in-list-helper item (cdr lyst) (+ 1 accum)))))
+
+(define generate-identifier
+  (lambda (ident cur-func-params line-num param-hash)
+    (append 
+     (list (string-append (number->string line-num) (format ":  LD 1,~a(3)\n" (+ 1 (hash-ref (hash-ref param-hash 'parameters) (string->symbol (string-append (symbol->string ident) "~"))))))
+           (string-append (number->string (+ 1 line-num)) ":  ST 1,0(5)\n")
+           (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n") ))))
+
+            
+            
 
 
 
+        
 
 
 
