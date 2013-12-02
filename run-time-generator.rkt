@@ -21,7 +21,7 @@
                           (string-append (number->string (+ 2 line-num)) ": LDC 4,1(0)\n")
                           (list (string-append (number->string (+ 3 line-num)) ": LDA 7,~a(0)\n")
                                 (symbol-table-lookup 'main)) ; note this for future reference for functions
-                          (string-append (number->string (+ 4 line-num)) ":  LD 1,0(0)\n")
+                          (string-append (number->string (+ 4 line-num)) ":  LD 1,0(3)\n")
                           (string-append (number->string (+ 5 line-num)) ": OUT 1,0,0\n" )
                           (string-append (number->string (+ 6 line-num)) ":HALT 0,0,0\n" ) ))))))
 
@@ -41,16 +41,19 @@
                                                     (generate-everything (definitions-definitions ast) cur-func-name line-num)))))
                     ((def? ast)         (let ((generated-body (generate-everything (def-body ast) 
                                                                                    (identifier-value (def-id ast))
-                                                                                   (+ 3 line-num))))
-                                          (let ((line-num-after-body (+ (+ 3 line-num) (length generated-body))))          
+                                                                                   (+ 5 line-num))))
+                                          (let ((line-num-after-body (+ (+ 5 line-num) (length generated-body))))          
                                             (hash-set! (hash-ref symbol-table (identifier-value (def-id ast))) 'tm-line line-num)
                                             (append (list (string-append "* " (symbol->string (identifier-value (def-id ast))) "\n")) ; add def to symbol table, branch number
                                                     (list (string-append (number->string line-num)       ": ADD 3,5,0\n"))
                                                     (list (string-append (number->string (+ 1 line-num)) (format ": LDC 1,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table (identifier-value (def-id ast))) 'amt-of-params)))))
                                                     (list (string-append (number->string (+ 2 line-num)) ": SUB 3,3,1\n"))
+                                                    (list (string-append (number->string (+ 3 line-num)) ":  ST 6,0(5)\n"))
+                                                    (list (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n"))
                                                     generated-body
                                                     (list (string-append (number->string line-num-after-body) ":  ST 1,0(3)\n"))
                                                     (list (string-append (number->string (+ 1 line-num-after-body)) ": ADD 5,3,0\n"))
+                                                    ;(list (string-append (number->string (+ 2 line-num-after-body)) (format ":  LD 6,~a(3)\n" (+ 1 (hash-ref (hash-ref symbol-table (identifier-value (def-id ast))) 'amt-of-params)))))
                                                     (list (string-append (number->string (+ 2 line-num-after-body)) ": LDA 7,0(6)\n")))))) ; use the let implementation to find out length of whole function
                     ((print-body? ast)  (let ((generated-print-expr (generate-everything (print-body-print-expr ast) cur-func-name line-num)))
                                           (let ((line-num-after-print-expr (+ line-num (length generated-print-expr))))
@@ -112,9 +115,10 @@
                     ((if~? ast)         (let ((generated-test-expr (generate-everything (if~-test ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-test-expr))))
                                             (let ((generated-test-expr (append generated-test-expr
+                                                                               (list (string-append (number->string line-num) ": SUB 5,5,4\n"))
                                                                                (list (lambda (offset) 
-                                                                                       (string-append (number->string line-num) (format ": JEQ 1,~a(7)\n" offset)))))))
-                                              (let ((line-num (+ line-num 1)))
+                                                                                       (string-append (number->string (+ 1 line-num)) (format ": JEQ 1,~a(7)\n" offset)))))))
+                                              (let ((line-num (+ line-num 2)))
                                                 (let ((generated-then-expr (generate-everything (if~-then ast) cur-func-name line-num)))
                                                   (let ((line-num (+ line-num (length generated-then-expr))))
                                                     (let ((generated-then-expr (append generated-then-expr
@@ -131,7 +135,34 @@
                                                                              line-num
                                                                              length-then
                                                                              length-else))))))))))))))
-                    ;((function-call? ast)  
+                    ((nonemptyactuals-prime? ast) (let ((generated-actual (generate-everything (nonemptyactuals-prime-expr ast) cur-func-name line-num)))
+                                                    (let ((line-num (+ line-num (length generated-actual))))
+                                                      (let ((generated-actuals (generate-everything (nonemptyactuals-prime-nonemptyactuals ast) cur-func-name line-num)))
+                                                        (let ((line-num (+ line-num (length generated-actuals))))
+                                                          (append generated-actual
+                                                                  generated-actuals))))))
+                    ((nonemptyactuals? ast)        (append (generate-everything (nonemptyactuals-expr ast) cur-func-name line-num)))
+                    ((empty-actuals? ast)          (list))
+                    ((function-call? ast)        (let ((generated-actuals (generate-everything (function-call-actuals ast) cur-func-name (+ 4 line-num))))
+                                                   (let ((line-num-after-actuals (+ (+ 4 line-num) (length generated-actuals))))
+                                                     (append (append 
+                                                              (list (string-append (number->string line-num)       ":  ST 3,0(5) start of function call\n")
+                                                                    (string-append (number->string (+ 1 line-num)) ": ADD 5,4,5\n")
+                                                                    ;(string-append (number->string (+ 2 line-num)) ": ADD 3,0,5\n") moved down
+                                                                    (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n")
+                                                                    (string-append (number->string (+ 3 line-num)) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals))))
+                                                              generated-actuals)
+                                                             (list (string-append (number->string line-num-after-actuals) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals)))
+                                                                   (list (string-append (number->string (+ 1 line-num-after-actuals)) ": LDA 7,~a(0)\n")
+                                                                         (symbol-table-lookup (identifier-value (function-call-name ast))))
+                                                                   (string-append (number->string (+ 2 line-num-after-actuals)) ": ADD 3,0,5\n")
+                                                                   (string-append (number->string (+ 3 line-num-after-actuals)) ":  LD 3,-1(5)\n")
+                                                                   (string-append (number->string (+ 4 line-num-after-actuals)) ":  LD 1,0(5)\n")
+                                                                   (string-append (number->string (+ 5 line-num-after-actuals)) ":  ST 1,-1(5)\n")
+                                                                   (string-append (number->string (+ 6 line-num-after-actuals)) ":  ST 1,0(3)\n")
+                                                                   (string-append (number->string (+ 7 line-num-after-actuals))
+                                                                                  (format ":  LD 6,~a(3) end of function call\n" (+ 1 (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params))))
+                                                                   )))))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
                     ))))
         (printf (create-tm-string (generate-everything ast 1 0) symbol-table))) )));check for parser error
@@ -153,8 +184,9 @@
 (define generate-print
   (lambda (tm-print-code line-num top-of-call-stack)
     (append tm-print-code
-            (list (string-append (number->string line-num)       ":  LD 1,-1(5)\n")
-                  (string-append (number->string (+ 1 line-num)) ": OUT 1,0,0\n")))))
+            (list ;(string-append (number->string line-num)       ":  LD 1,-1(5) print starts here\n")
+                  (string-append (number->string  line-num) ": OUT 1,0,0 print starts here\n")
+                  (string-append (number->string (+ 1 line-num)) ": SUB 5,5,4\n")))))
 
 
 (define generate-addition
@@ -164,8 +196,10 @@
             (list (string-append (number->string line-num)       ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num)) ":  LD 2,-1(5)\n")
                   (string-append (number->string (+ 2 line-num)) ": ADD 1,1,2\n")
-                  (string-append (number->string (+ 3 line-num)) ":  ST 1,0(5)\n")
-                  (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n")))))
+                  (string-append (number->string (+ 3 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 4 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 5 line-num)) ":  ST 1,0(5)\n")
+                  (string-append (number->string (+ 6 line-num)) ": ADD 5,4,5\n")))))
 
 (define generate-subtraction
   (lambda (left-expr right-expr line-num)
@@ -174,8 +208,10 @@
             (list (string-append (number->string line-num)       ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num)) ":  LD 2,-1(5)\n")
                   (string-append (number->string (+ 2 line-num)) ": SUB 1,1,2\n")
-                  (string-append (number->string (+ 3 line-num)) ":  ST 1,0(5)\n")
-                  (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n")))))
+                  (string-append (number->string (+ 3 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 4 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 5 line-num)) ":  ST 1,0(5)\n")
+                  (string-append (number->string (+ 6 line-num)) ": ADD 5,4,5\n")))))
 
 (define generate-multiplication
   (lambda (left-expr right-expr line-num)
@@ -184,8 +220,10 @@
             (list (string-append (number->string line-num)       ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num)) ":  LD 2,-1(5)\n")
                   (string-append (number->string (+ 2 line-num)) ": MUL 1,1,2\n")
-                  (string-append (number->string (+ 3 line-num)) ":  ST 1,0(5)\n")
-                  (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n")))))
+                  (string-append (number->string (+ 3 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 4 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 5 line-num)) ":  ST 1,0(5)\n")
+                  (string-append (number->string (+ 6 line-num)) ": ADD 5,4,5\n")))))
 
 (define generate-division
   (lambda (left-expr right-expr line-num)
@@ -194,8 +232,10 @@
             (list (string-append (number->string line-num)       ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num)) ":  LD 2,-1(5)\n")
                   (string-append (number->string (+ 2 line-num)) ": DIV 1,1,2\n")
-                  (string-append (number->string (+ 3 line-num)) ":  ST 1,0(5)\n")
-                  (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n")))))
+                  (string-append (number->string (+ 3 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 4 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 5 line-num)) ":  ST 1,0(5)\n")
+                  (string-append (number->string (+ 6 line-num)) ": ADD 5,4,5\n")))))
 
 (define generate-negative-value
   (lambda (neg-val-expr line-num)
@@ -204,8 +244,9 @@
                   (string-append (number->string (+ 1 line-num)) ":  LD 2,-1(5)\n")
                   (string-append (number->string (+ 2 line-num)) ": SUB 1,1,2\n")
                   (string-append (number->string (+ 3 line-num)) ": SUB 1,1,2\n")
-                  (string-append (number->string (+ 4 line-num)) ":  ST 1,0(5)\n")
-                  (string-append (number->string (+ 5 line-num)) ": ADD 5,4,5\n")))))
+                  (string-append (number->string (+ 4 line-num)) ": SUB 5,5,4\n")
+                  (string-append (number->string (+ 5 line-num)) ":  ST 1,0(5)\n")
+                  (string-append (number->string (+ 6 line-num)) ": ADD 5,4,5\n")))))
 
 (define generate-and~;optimize?
   (lambda (left-expr right-expr line-num)
@@ -213,16 +254,18 @@
             right-expr
             (list (string-append (number->string line-num)        ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num))  ":  LD 2,-1(5)\n")
-                  (string-append (number->string (+ 2 line-num))  ": JNE 1,0(7)\n" )
-                  (string-append (number->string (+ 3 line-num))  ": JNE 2,1(7)\n" )
-                  (string-append (number->string (+ 4 line-num))  ": JEQ 0,4(7)\n" )
-                  (string-append (number->string (+ 5 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
-                  (string-append (number->string (+ 6 line-num))  ":  ST 1,0(5)\n" )
-                  (string-append (number->string (+ 7 line-num))  ": ADD 5,4,5\n"  )
-                  (string-append (number->string (+ 8 line-num))  ": JEQ 0,3(7)\n" )
-                  (string-append (number->string (+ 9 line-num))  ":  ST 0,0(5)\n" )
-                  (string-append (number->string (+ 10 line-num)) ": LDC 1,0(0)\n" )
-                  (string-append (number->string (+ 11 line-num)) ": ADD 5,4,5\n"  ) ))))
+                  (string-append (number->string (+ 3 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 4 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 5 line-num))  ": JNE 1,0(7)\n" )
+                  (string-append (number->string (+ 6 line-num))  ": JNE 2,1(7)\n" )
+                  (string-append (number->string (+ 7 line-num))  ": JEQ 0,4(7)\n" )
+                  (string-append (number->string (+ 8 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
+                  (string-append (number->string (+ 9 line-num))  ":  ST 1,0(5)\n" )
+                  (string-append (number->string (+ 10 line-num)) ": ADD 5,4,5\n"  )
+                  (string-append (number->string (+ 11 line-num)) ": JEQ 0,3(7)\n" )
+                  (string-append (number->string (+ 12 line-num)) ":  ST 0,0(5)\n" )
+                  (string-append (number->string (+ 13 line-num)) ": LDC 1,0(0)\n" )
+                  (string-append (number->string (+ 14 line-num)) ": ADD 5,4,5\n"  ) ))))
 
 (define generate-or~
   (lambda (left-expr right-expr line-num)
@@ -230,15 +273,17 @@
             right-expr
             (list (string-append (number->string line-num)        ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num))  ":  LD 2,-1(5)\n")
-                  (string-append (number->string (+ 2 line-num))  ": ADD 1,1,2\n"  )
-                  (string-append (number->string (+ 3 line-num))  ": JNE 1,4(7)\n" )
-                  (string-append (number->string (+ 4 line-num))  ":  ST 0,0(5)\n" )
-                  (string-append (number->string (+ 5 line-num))  ": LDC 1,0(0)\n" )
-                  (string-append (number->string (+ 6 line-num))  ": ADD 5,4,5\n"  )
-                  (string-append (number->string (+ 7 line-num))  ": JEQ 0,3(7)\n" )
-                  (string-append (number->string (+ 8 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
-                  (string-append (number->string (+ 9 line-num))  ":  ST 1,0(5)\n" )
-                  (string-append (number->string (+ 10 line-num)) ": ADD 5,4,5\n"  ) ))))
+                  (string-append (number->string (+ 2 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 3 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 4 line-num))  ": ADD 1,1,2\n"  )
+                  (string-append (number->string (+ 5 line-num))  ": JNE 1,4(7)\n" )
+                  (string-append (number->string (+ 6 line-num))  ":  ST 0,0(5)\n" )
+                  (string-append (number->string (+ 7 line-num))  ": LDC 1,0(0)\n" )
+                  (string-append (number->string (+ 8 line-num))  ": ADD 5,4,5\n"  )
+                  (string-append (number->string (+ 9 line-num))  ": JEQ 0,3(7)\n" )
+                  (string-append (number->string (+ 10 line-num)) ": LDC 1,1(0)\n" );can maybe get rid of!
+                  (string-append (number->string (+ 11 line-num)) ":  ST 1,0(5)\n" )
+                  (string-append (number->string (+ 12 line-num)) ": ADD 5,4,5\n"  ) ))))
 
 (define generate-equals
   (lambda (left-expr right-expr line-num)
@@ -246,15 +291,17 @@
             right-expr
             (list (string-append (number->string line-num)        ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num))  ":  LD 2,-1(5)\n")
-                  (string-append (number->string (+ 2 line-num))  ": SUB 1,1,2\n"  )
-                  (string-append (number->string (+ 3 line-num))  ": JEQ 1,4(7)\n" )
-                  (string-append (number->string (+ 4 line-num))  ":  ST 0,0(5)\n" )
-                  (string-append (number->string (+ 5 line-num))  ": LDC 1,0(0)\n" )
-                  (string-append (number->string (+ 6 line-num))  ": ADD 5,4,5\n"  )
-                  (string-append (number->string (+ 7 line-num))  ": JEQ 0,3(7)\n" )
-                  (string-append (number->string (+ 8 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
-                  (string-append (number->string (+ 9 line-num))  ":  ST 1,0(5)\n" )
-                  (string-append (number->string (+ 10 line-num)) ": ADD 5,4,5\n"  ) ))))
+                  (string-append (number->string (+ 2 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 3 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 4 line-num))  ": SUB 1,1,2\n"  )
+                  (string-append (number->string (+ 5 line-num))  ": JEQ 1,4(7)\n" )
+                  (string-append (number->string (+ 6 line-num))  ":  ST 0,0(5)\n" )
+                  (string-append (number->string (+ 7 line-num))  ": LDC 1,0(0)\n" )
+                  (string-append (number->string (+ 8 line-num))  ": ADD 5,4,5\n"  )
+                  (string-append (number->string (+ 9 line-num))  ": JEQ 0,3(7)\n" )
+                  (string-append (number->string (+ 10 line-num)) ": LDC 1,1(0)\n" );can maybe get rid of!
+                  (string-append (number->string (+ 11 line-num)) ":  ST 1,0(5)\n" )
+                  (string-append (number->string (+ 12 line-num)) ": ADD 5,4,5\n"  ) ))))
 
 (define generate-less-than
   (lambda (left-expr right-expr line-num)
@@ -262,29 +309,32 @@
             right-expr
             (list (string-append (number->string line-num)        ":  LD 1,-2(5)\n")
                   (string-append (number->string (+ 1 line-num))  ":  LD 2,-1(5)\n")
-                  (string-append (number->string (+ 2 line-num))  ": SUB 1,2,1\n"  )
-                  (string-append (number->string (+ 3 line-num))  ": JGT 1,4(7)\n" )
-                  (string-append (number->string (+ 4 line-num))  ":  ST 0,0(5)\n" )
-                  (string-append (number->string (+ 5 line-num))  ": LDC 1,0(0)\n" )
-                  (string-append (number->string (+ 6 line-num))  ": ADD 5,4,5\n"  )
-                  (string-append (number->string (+ 7 line-num))  ": JEQ 0,3(7)\n" )
-                  (string-append (number->string (+ 8 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
-                  (string-append (number->string (+ 9 line-num))  ":  ST 1,0(5)\n" )
-                  (string-append (number->string (+ 10 line-num)) ": ADD 5,4,5\n"  ) ))))
+                  (string-append (number->string (+ 2 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 3 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 4 line-num))  ": SUB 1,2,1\n"  )
+                  (string-append (number->string (+ 5 line-num))  ": JGT 1,4(7)\n" )
+                  (string-append (number->string (+ 6 line-num))  ":  ST 0,0(5)\n" )
+                  (string-append (number->string (+ 7 line-num))  ": LDC 1,0(0)\n" )
+                  (string-append (number->string (+ 8 line-num))  ": ADD 5,4,5\n"  )
+                  (string-append (number->string (+ 9 line-num))  ": JEQ 0,3(7)\n" )
+                  (string-append (number->string (+ 10 line-num)) ": LDC 1,1(0)\n" );can maybe get rid of!
+                  (string-append (number->string (+ 11 line-num)) ":  ST 1,0(5)\n" )
+                  (string-append (number->string (+ 12 line-num)) ": ADD 5,4,5\n"  ) ))))
 
 
 (define generate-not
   (lambda (not-expr line-num)
     (append not-expr
             (list (string-append (number->string line-num)        ":  LD 1,-1(5)\n")
-                  (string-append (number->string (+ 1 line-num))  ": JNE 1,4(7)\n")
-                  (string-append (number->string (+ 2 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
-                  (string-append (number->string (+ 3 line-num))  ":  ST 1,0(5)\n" )
-                  (string-append (number->string (+ 4 line-num)) ": ADD 5,4,5\n"  )
-                  (string-append (number->string (+ 5 line-num))  ": JEQ 0,3(7)\n" )
-                  (string-append (number->string (+ 6 line-num))  ":  ST 0,0(5)\n" )
-                  (string-append (number->string (+ 7 line-num))  ": LDC 1,0(0)\n" )
-                  (string-append (number->string (+ 8 line-num))  ": ADD 5,4,5\n"  ) ))))
+                  (string-append (number->string (+ 1 line-num))  ": SUB 5,5,4\n"  )
+                  (string-append (number->string (+ 2 line-num))  ": JNE 1,4(7)\n" )
+                  (string-append (number->string (+ 3 line-num))  ": LDC 1,1(0)\n" );can maybe get rid of!
+                  (string-append (number->string (+ 4 line-num))  ":  ST 1,0(5)\n" )
+                  (string-append (number->string (+ 5 line-num))  ": ADD 5,4,5\n"  )
+                  (string-append (number->string (+ 6 line-num))  ": JEQ 0,3(7)\n" )
+                  (string-append (number->string (+ 7 line-num))  ":  ST 0,0(5)\n" )
+                  (string-append (number->string (+ 8 line-num))  ": LDC 1,0(0)\n" )
+                  (string-append (number->string (+ 9 line-num))  ": ADD 5,4,5\n"  ) ))))
 
 (define fillin-offset
   (lambda (offset)
@@ -314,15 +364,26 @@
            (string-append (number->string (+ 1 line-num)) ":  ST 1,0(5)\n")
            (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n") ))))
 
-            
-            
-
+;(define generate-func-call
+;  (lambda (func-call line-num symbol-table)
+;    (append 
+;     (list (string-append (number->string line-num)       ":  ST 3,0(5)\n")
+;           (string-append (number->string (+ 1 line-num)) ": ADD 5,4,5\n")
+;           (string-append (number->string (+ 2 line-num)) ": ADD 3,0,5\n")
+;           (string-append (number->string (+ 3 line-num)) ": ADD 5,4,5\n")
+;           (generate-actuals (function-call-actuals func-call))
+;           (string-append (number->string (+ 
 
 
         
-
-
-
+(define generate-actuals
+  (lambda (actuals)
+    (append 
+     (cond 
+       ((nonemptyactuals? actuals)       (list (nonemptyactuals-expr actuals)))
+       ((nonemptyactuals-prime? actuals) (append (generate-actuals (nonemptyactuals-prime-expr actuals))
+                                                 (generate-actuals (nonemptyactuals-prime-nonemptyactuals actuals))))
+        ((empty-actuals? actuals) (list))))))
 
 
 
@@ -355,8 +416,8 @@
 
 (define create-tm-string
   (lambda (list-of-tm-lines symbol-table)
-    (string-join (map (eval-tm-lines symbol-table)
-                      list-of-tm-lines) 
+    (string-join (flatten (map (eval-tm-lines symbol-table)
+                      list-of-tm-lines))
                  "")))
   
 (define write-out
@@ -366,7 +427,10 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
+;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
+(generate (semantic-analysis (parser "klein-programs/square-root.kln")))
+
+
 
 
 

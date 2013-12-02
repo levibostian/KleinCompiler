@@ -1,5 +1,6 @@
-test() : integer 
-  1
+main( n : integer ) : boolean
+  printAndReturn( true )
 
-main(a : integer, b : integer) : boolean
-  a + b
+printAndReturn( bool : boolean ) : boolean
+  print( bool )
+  bool
