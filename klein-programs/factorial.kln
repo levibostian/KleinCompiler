@@ -5,7 +5,7 @@
 main (n : integer) : boolean
     factorial(n)
 
-factorial(n : integer) : integer
+factorial(n : integer) : boolean
     if n = 1 then
         1
     else

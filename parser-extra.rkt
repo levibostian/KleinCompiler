@@ -99,7 +99,14 @@
                (symbol->string (token-value token)) 
                'on 'column:  (token-col token) 
                'on 'row: (token-row token)
-               'stack: stack )) )
+               'top-of-stack: (get-top-of-stack stack) )) )
+(define print-transition-error
+  (lambda (token stack)
+    (list  'ERROR: 'with 
+           (symbol->string (token-value token)) 
+           'on 'column:  (token-col token) 
+           'on 'row: (token-row token))))
+
 (define transition-error?
   (lambda (grammar-rule)
     (eq? grammar-rule err)) )

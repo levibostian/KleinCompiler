@@ -165,7 +165,9 @@
                                                                    )))))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
                     ))))
-        (printf (create-tm-string (generate-everything ast 1 0) symbol-table))) )));check for parser error
+        (if (error-ast? ast)
+            ast
+            (printf (create-tm-string (generate-everything ast 1 0) symbol-table)))) )));check for parser error
 
 (define generate-number
   (lambda (value top-of-call-stack line-num)
@@ -428,7 +430,8 @@
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
-(generate (semantic-analysis (parser "klein-programs/square-root.kln")))
+;(parser "klein-programs/08-addition.kln")
+(generate (semantic-analysis (parser "klein-programs/fibonacci.kln")))
 
 
 
