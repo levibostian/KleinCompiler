@@ -267,6 +267,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;(display (print/program (semantic-analysis (parser "klein-programs/08-addition.kln"))))
 ;(display (print/program (parser "klein-programs/circular-prime.kln")))
 ;(display (print/program (parser "klein-programs/test.kln")))
 ;(display (print/program (parser "klein-programs/euclid.kln")))

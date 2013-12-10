@@ -24,8 +24,9 @@
                                  (cons pos-of-formal type-of-formal)
                                  (cons (string->symbol (string-append (symbol->string (identifier-value (formal-id ast))) "~")) pos-of-formal) )))
           ((empty-formals? ast) (list (cons '**null** '**null**)))
-          (else (display "ERROR WITH symbol-table-helper, NOTHING MATCHED")
-                (display ast)) )))
+          ;(else ;(display "ERROR WITH symbol-table-helper, NOTHING MATCHED")   UNCOMMENT FOR DEBUGGING!
+                ;(display ast)) 
+          )))
 
 
 (define test (symbol-table (parser "klein-programs/test.kln")))

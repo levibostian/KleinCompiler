@@ -1,5 +1,8 @@
 #lang racket
 
+;it ain't pretty, but it works :)
+;(Could be cleaned up very easily just didn't have time)
+
 (provide (all-defined-out))
 (require "type-checker.rkt"
          "parser.rkt"
@@ -376,8 +379,7 @@
 ;           (generate-actuals (function-call-actuals func-call))
 ;           (string-append (number->string (+ 
 
-
-        
+  
 (define generate-actuals
   (lambda (actuals)
     (append 
@@ -387,34 +389,12 @@
                                                  (generate-actuals (nonemptyactuals-prime-nonemptyactuals actuals))))
         ((empty-actuals? actuals) (list))))))
 
-
-
-
 (define eval-tm-lines
   (lambda (symbol-table)
     (lambda (line)
       (if (and (list? line) (eqv? (length line) 2))
           (format (car line) (hash-ref ((cadr line) symbol-table) 'tm-line))
           line))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 (define create-tm-string
   (lambda (list-of-tm-lines symbol-table)
@@ -429,9 +409,9 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
+;(generate (semantic-analysis (parser "klein-programs/circular-prime.kln")))
 ;(parser "klein-programs/08-addition.kln")
-(generate (semantic-analysis (parser "klein-programs/fibonacci.kln")))
+;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
 
 
 

@@ -46,7 +46,11 @@
         ast
         (let ((sym-table (symbol-table ast)))
           (if (no-user-defined-print? sym-table)
-              (type-check-helper ast 'nothing (symbol-table ast))
+              (let ((type-check-ast (type-check-helper ast 'nothing (symbol-table ast))))
+                (let ((type-errors (check-for-type-errors-helper type-check-ast 'not-yet)))
+                  (if (equal? type-errors null)
+                      type-check-ast
+                      type-errors)))
               "Error: cannot overwrite print")))))
               
       
@@ -59,7 +63,7 @@
                                                   symbol-table
                                                   type-err))
                  (ident-val (identifier-value ast)))
-             (display-errors ident-type (list ident-val 'in current-function 'referenced 'before 'assignment))
+             ;(display-errors ident-type (list ident-val 'in current-function 'referenced 'before 'assignment))
              (make-identifier 
               (identifier-value ast)
               ident-type)))
@@ -133,8 +137,8 @@
 (define type-check-body
   (lambda (bod current-function symbol-table)
     (let ((type-checked-body (type-check-helper (body-expr bod) current-function symbol-table)))
-      (display-errors (get-type-of-exp type-checked-body) 
-                      (list 'body 'in current-function 'incompatible 'type 'with 'function 'return 'type))
+     ; (display-errors (get-type-of-exp type-checked-body) 
+                    ;  (list 'body 'in current-function 'incompatible 'type 'with 'function 'return 'type))
       (make-body type-checked-body
                  (if (eq? (get-function-type current-function symbol-table type-err)
                           (get-type-of-exp type-checked-body))
@@ -163,8 +167,8 @@
                                (get-type-of-exp type-checked-left )
                                (get-type-of-exp type-checked-right)
                                result-type)))
-        (display-errors check-sides-result
-                        (list 'expression: left exp-symbol right 'in current-function 'incompatible 'types))         
+        ;(display-errors check-sides-result
+        ;                (list 'expression: left exp-symbol right 'in current-function 'incompatible 'types))
         (make type-checked-left type-checked-right check-sides-result)))))
      
 
@@ -267,8 +271,8 @@
 (define type-check-negative-value
   (lambda (neg-val current-function symbol-table)
     (let ((type-checked-exp (type-check-helper (negative-value-value neg-val) current-function symbol-table)))
-      (display-errors (get-type-of-exp type-checked-exp) 
-                      (list '- type-checked-exp 'in current-function 'must 'be 'integer))
+      ;(display-errors (get-type-of-exp type-checked-exp) 
+      ;                (list '- type-checked-exp 'in current-function 'must 'be 'integer))
       (make-negative-value type-checked-exp
                            (if (eq? (get-type-of-exp type-checked-exp) int-type)
                                int-type
@@ -282,12 +286,12 @@
       (let ((test-type (get-type-of-exp type-checked-test))
             (then-type (get-type-of-exp type-checked-then))
             (else-type (get-type-of-exp type-checked-else)))
-        (display-errors test-type 
-                        (list 'if 'test: type-checked-test '_in current-function 'must 'be 'boolean))
-        (display-errors then-type 
-                        (list 'if 'then: type-checked-then '_in current-function 'type 'error))
-        (display-errors else-type
-                        (list 'if 'then: type-checked-else '_in current-function 'type 'error))
+       ; (display-errors test-type 
+       ;                 (list 'if 'test: type-checked-test '_in current-function 'must 'be 'boolean))
+       ; (display-errors then-type 
+       ;                 (list 'if 'then: type-checked-then '_in current-function 'type 'error))
+       ; (display-errors else-type
+       ;                 (list 'if 'then: type-checked-else '_in current-function 'type 'error))
         (make-if~ type-checked-test
                   type-checked-then
                   type-checked-else
@@ -306,8 +310,8 @@
 (define type-check-not
   (lambda (not~ current-function symbol-table)
     (let ((type-checked-exp (type-check-helper (not-value not~) current-function symbol-table)))
-      (display-errors (get-type-of-exp type-checked-exp) 
-                      (list 'not type-checked-exp 'in current-function 'must 'be 'integer))
+      ;(display-errors (get-type-of-exp type-checked-exp) 
+      ;                (list 'not type-checked-exp 'in current-function 'must 'be 'integer))
       (make-not type-checked-exp
                 (if (eq? (get-type-of-exp type-checked-exp) bool-type)
                     bool-type
@@ -317,8 +321,8 @@
   (lambda (f-c current-function symbol-table)
     (let ((function-name (function-call-name f-c)))
       (let ((function-type (get-function-type (identifier-value function-name) symbol-table type-err)))
-        (display-errors function-type
-                        (list 'function 'call 'in current-function 'does 'not 'exist))
+        ;(display-errors function-type
+        ;                (list 'function 'call 'in current-function 'does 'not 'exist))
         (make-function-call (function-call-name f-c)
                             (checks-type-by-formal-pos (function-call-actuals f-c) (identifier-value function-name) current-function 0 symbol-table type-err)
                             (get-function-type (identifier-value function-name) symbol-table type-err) )))))
@@ -346,4 +350,79 @@
                                                                   sym-table
                                                                   error-type)))
           ((empty-actuals? actuals) actuals)
-          (else (type-check-helper actuals current-function sym-table)))))
+          (else (let ((type-checked-expr (type-check-helper actuals current-function sym-table))
+                      (looked-up-type (get-formal-by-pos function-caller sym-table pos error-type)))
+                  (make-nonemptyactuals type-checked-expr
+                                        (if (eq? (get-type-of-exp type-checked-expr) looked-up-type)
+                                            looked-up-type
+                                            error-type)))))))
+
+(define type-err?
+  (lambda (type)
+    (equal? type type-err)))
+
+(define binary-exp-error 
+  (lambda (left right exp-symbol current-function)
+    (list 'expression: left exp-symbol right 'in current-function 'incompatible 'types)))
+
+(define no-type-err '())
+(define get-error-if-exists
+  (lambda (type error-msg)
+    (if (type-err? type)
+        error-msg
+        no-type-err)))
+
+(define check-for-type-errors-helper
+  (lambda (ast cur-func)
+    (cond ((identifier? ast)     (get-error-if-exists (list (get-type-of-exp ast) (list (identifier-value ast) ':unbound 'identifier 'in cur-func))))
+          ((program? ast)        (check-for-type-errors-helper (program-definitions ast) cur-func))
+          ((definitions? ast)    (append (check-for-type-errors-helper (definitions-def ast) cur-func)
+                                         (check-for-type-errors-helper (definitions-definitions ast) cur-func)))
+          ((def? ast)            (check-for-type-errors-helper (def-body ast) (identifier-value (def-id ast))))
+          ((body? ast)           (append (list (get-error-if-exists (get-type-of-exp ast) (list 'body-type 'does 'not 'match 'function-type 'in 'function cur-func)))
+                                         (check-for-type-errors-helper (body-expr ast) cur-func)))
+          ((print~? ast)         no-type-err)
+          ((print-body? ast)     no-type-err)
+          ((equals? ast)         (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (equals-left ast) (equals-right ast) '= cur-func)))
+                                         (check-for-type-errors-helper (equals-left ast) cur-func)
+                                         (check-for-type-errors-helper (equals-right ast) cur-func)))
+          ((less-than? ast)      (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (less-than-left ast) (less-than-right ast) '< cur-func)))
+                                         (check-for-type-errors-helper (less-than-left ast) cur-func)
+                                         (check-for-type-errors-helper (less-than-right ast) cur-func)))
+          ((addition? ast)       (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (addition-left ast) (addition-right ast) '+ cur-func)))
+                                         (check-for-type-errors-helper (addition-left ast) cur-func)
+                                         (check-for-type-errors-helper (addition-right ast) cur-func)))
+          ((subtraction? ast)    (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (subtraction-left ast) (subtraction-right ast) '- cur-func)))
+                                         (check-for-type-errors-helper (subtraction-left ast) cur-func)
+                                         (check-for-type-errors-helper (subtraction-right ast) cur-func)))
+          ((or~? ast)            (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (or~-left ast) (or~-right ast) 'or cur-func)))
+                                         (check-for-type-errors-helper (or~-left ast) cur-func)
+                                         (check-for-type-errors-helper (or~-right ast) cur-func)))
+          ((multiplication? ast) (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (multiplication-left ast) (multiplication-right ast) '* cur-func)))
+                                         (check-for-type-errors-helper (multiplication-left ast) cur-func)
+                                         (check-for-type-errors-helper (multiplication-right ast) cur-func)))
+          ((division? ast)       (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (division-left ast) (division-right ast) '/ cur-func)))
+                                         (check-for-type-errors-helper (division-left ast) cur-func)
+                                         (check-for-type-errors-helper (division-right ast) cur-func)))
+          ((and~? ast)           (append (list (get-error-if-exists (get-type-of-exp ast) (binary-exp-error (and~-left ast) (and~-right ast) 'and cur-func)))
+                                         (check-for-type-errors-helper (and~-left ast) cur-func)
+                                         (check-for-type-errors-helper (and~-right ast) cur-func)))
+          ((negative-value? ast) (append (list (get-error-if-exists (get-type-of-exp ast) (list 'negate-expression 'of (negative-value-value ast) 'in cur-func 'must 'be 'integer)))
+                                         (check-for-type-errors-helper (not-value ast) cur-func)))
+          ((if~? ast)            (append (check-for-type-errors-helper (if~-test ast) cur-func)
+                                         (check-for-type-errors-helper (if~-then ast) cur-func)
+                                         (check-for-type-errors-helper (if~-else ast) cur-func)))
+          ((not? ast)            (append (list (get-error-if-exists (get-type-of-exp ast) (list 'not-expression 'of (not-value ast) 'in cur-func 'must 'be 'boolean)))
+                                         (check-for-type-errors-helper (not-value ast) cur-func)))
+          ((boolean~? ast)       no-type-err)
+          ((number? ast)         no-type-err) ;problem with name?
+          ((function-call? ast) (append (list (get-error-if-exists (get-type-of-exp ast) (list 'function-call 'error: 'possibly 'with 'args 'or 'type-mismatch 'not 'super 'helpful) ))
+                                        (check-for-type-errors-helper (function-call-actuals ast) cur-func)))
+          ((nonemptyactuals? ast) (list (get-error-if-exists (get-type-of-exp ast) (list 'arg-error 'in 'function-call 'in cur-func))))
+          ((nonemptyactuals-prime? ast) (append (check-for-type-errors-helper (nonemptyactuals-prime-expr ast) cur-func)
+                                                (check-for-type-errors-helper (nonemptyactuals-prime-nonemptyactuals ast) cur-func))) )))
+
+
+
+
+
