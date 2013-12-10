@@ -1,2 +1,6 @@
 main() : integer
-  false * 5
+  1 
+
+main() : integer
+  1
+
