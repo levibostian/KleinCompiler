@@ -28,9 +28,6 @@
                 ;(display ast)) 
           )))
 
-
-(define test (symbol-table (parser "klein-programs/test.kln")))
-
 ;{ 
 ;  function-name1: 
 ;  {
