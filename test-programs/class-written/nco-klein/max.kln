@@ -1,0 +1,6 @@
+max(a : integer, b : integer) : integer
+	if a > b
+		a
+	else
+		b
+	endif

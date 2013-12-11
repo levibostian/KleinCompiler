@@ -1,0 +1,26 @@
+// This program is a solution to a Project Euler problem, 
+// and computes the sum of all the multiples of 3 or 5 below 1000
+
+main() : integer
+	sumOfMultiples( 0, 999 )
+
+sumOfMultiples( sum : integer, number : integer ) : integer
+	if divisibleByThree( number ) and divisibleByFive( number ) then
+		if number = 0 then
+			sum
+		else
+			sumOfMultiples( sum + number, number - 1 )
+		endif
+	else
+		sumOfMultiples( sum, number - 1 )
+	endif
+	
+divisibleByThree( t : integer ) : boolean
+	MOD( t, 3 ) = 0
+
+divisibleByFive( x : integer ) : boolean
+	MOD( x, 5 ) = 0
+
+
+MOD( m : integer, n : integer ) : integer
+    m - m/n * n

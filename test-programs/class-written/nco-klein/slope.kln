@@ -1,0 +1,20 @@
+// Author: Jordan Greiner
+// File: slope.kln
+// Date: November 07, 2013
+// Comments: Program to calculate the slope of a line when
+//           given two points in a graph. (forced to an int)
+
+main( y2 : integer, y1 : integer, x2 : integer, x1 : integer ) : boolean
+  printAndReturn( slope(y2 - y1, x2 - x1 ) )
+
+slope( top : integer, bottom : integer ) : integer
+  top/bottom
+  
+
+// ----------------------------------------------
+// Taken from Dr. W.
+// ----------------------------------------------
+
+printAndReturn( bool : boolean ) : boolean
+  print( bool )
+  bool

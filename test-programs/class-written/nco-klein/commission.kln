@@ -1,0 +1,11 @@
+// Decides commission for total sale
+
+
+commission(totalSale : integer, LowCommission : integer, highCommission: integer, x : integer) : integer
+
+  if totalSale < x then
+    lowCommission
+  else
+    highCommission
+  endif
+

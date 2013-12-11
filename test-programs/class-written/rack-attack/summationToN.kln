@@ -1,0 +1,13 @@
+// this program sums up the numbers from 1 to n
+
+main ( sumToNum : integer ) : integer
+	sumTo(1, 0, sumToNum)
+
+sumTo( current : integer, result : integer, sumToNum : integer): integer
+	if current > sumToNum then
+		result
+	else
+		result = result + current
+		current = current + 1
+		sumTo(current, result, sumToNum)
+	endif

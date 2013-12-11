@@ -1,0 +1,34 @@
+//returns the same number regardless of input
+//outputs input if input is less then 0
+
+main(a : integer) : integer
+	if a < 0 then
+   	printLessThanZero(a)
+	else
+   	printLessThanZero(magic(a))
+	endif
+
+printLessThanZero(a: integer): integer
+            print(a)
+            a
+
+magic(a : integer) : integer
+	stepOne(a, 2*a)
+
+stepOne(a : integer, b : integer) : integer
+	stepTwo(a, b+20)
+
+stepTwo(a : integer, b : integer) : integer
+	stepThree(a, b/4)
+
+stepThree(a : integer, b : integer) : integer
+	stepFour(a, b*8)
+
+stepFour(a : integer, b : integer) : integer
+	stepFive(a, b-4*a)
+
+stepFive(a : integer, b : integer) : integer
+	stepSix(a, b/8)
+
+stepSix(a : integer, b : integer) : integer
+	b
