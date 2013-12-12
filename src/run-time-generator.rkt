@@ -178,8 +178,8 @@
                                                                        (string-append (number->string (+ 3 line-num-after-actuals)) ":  LD 3,-1(5)\n")
                                                                        (string-append (number->string (+ 4 line-num-after-actuals)) ":  LD 1,0(5)\n")
                                                                        (string-append (number->string (+ 5 line-num-after-actuals)) ":  ST 1,-1(5)\n")
-                                                                       (string-append (number->string (+ 6 line-num-after-actuals)) ":  ST 1,0(3)\n")
-                                                                       (string-append (number->string (+ 7 line-num-after-actuals))
+                                                                       ;(string-append (number->string (+ 6 line-num-after-actuals)) ":  ST 1,0(3)\n")
+                                                                       (string-append (number->string (+ 6 line-num-after-actuals))
                                                                                       (format ":  LD 6,~a(3) end of function call\n" (+ 1 (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params))))
                                                                        ))))))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
@@ -435,7 +435,7 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-(generate (semantic-analysis (parser "../test-programs/team-written/factorial.kln")))
+(generate (semantic-analysis (parser "factorial.kln")))
 ;(parser "klein-programs/08-addition.kln")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
 

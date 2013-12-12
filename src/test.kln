@@ -3,5 +3,14 @@ main( m : integer, n : integer) : integer
   if n < m then
   	12345
   else
-  	main( m + 1, n )
+  	main( addOne(m), n )
   endif
+
+addOne( n : integer ) : integer
+  n + 1
+
+// main() : integer
+//   1
+
+// // test( n : integer ) : integer
+// //   1
