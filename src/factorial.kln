@@ -1,0 +1,19 @@
+// Klein example: factorial.kln
+// Team: RackAttack
+// cs4550 - Fall 2013
+
+main (n : integer) : integer
+    factorial(n, n)
+
+factorial(n : integer, accum: integer) : integer
+    print( accum )
+    print(n)
+    print(accum * n-1)
+    if n = 1 then
+        accum
+    else
+        factorial(n - 1, accum * sub(n, 1))
+    endif
+
+sub(x:integer,y:integer): integer
+  x - y

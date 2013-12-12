@@ -1,16 +1,16 @@
-main( m : integer, n : integer) : integer
+main( m: integer, n : integer) : integer
+  test(m, n)
+
+test( m : integer, n : integer ) : integer
   print( m )
   if n < m then
   	12345
   else
-  	main( addOne(m), n )
+  	test( m + 1, n )
   endif
-
-addOne( n : integer ) : integer
-  n + 1
-
-// main() : integer
-//   1
-
-// // test( n : integer ) : integer
-// //   1
+// main(): integer
+//   if 1 < 2 then
+//   	100
+//   else 
+//     200
+//   endif
