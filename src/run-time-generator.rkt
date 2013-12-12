@@ -32,7 +32,7 @@
   (lambda (ast)  ; find way to keep track of top of call stack
     (let ((symbol-table (symbol-table ast)))
       (letrec ((generate-everything
-                (lambda (ast cur-func-name line-num)
+                (lambda (ast cur-func-name line-num [tr? #f])
                   (cond 
                     ((program? ast)     (let ((generated-runtime (generate-runtime line-num symbol-table)))
                                           (let ((line-num (length generated-runtime)))
@@ -64,7 +64,7 @@
                                               (let ((line-num-after-print (+ line-num (length generated-print))))
                                                 (append  generated-print
                                                          (generate-everything (print-body-expr ast) cur-func-name line-num-after-print)))))))
-                    ((body? ast)        (append (generate-everything (body-expr ast) cur-func-name line-num)))
+                    ((body? ast)        (append (generate-everything (body-expr ast) cur-func-name line-num #t)))
                     ((print~? ast)      (append (generate-everything (print~-expr ast) cur-func-name line-num)))
                     ((addition? ast)    (let ((generated-left-expr (generate-everything (addition-left ast) cur-func-name line-num)))
                                           (let ((line-num (+ line-num (length generated-left-expr))))
@@ -122,14 +122,14 @@
                                                                                (list (lambda (offset) 
                                                                                        (string-append (number->string (+ 1 line-num)) (format ": JEQ 1,~a(7)\n" offset)))))))
                                               (let ((line-num (+ line-num 2)))
-                                                (let ((generated-then-expr (generate-everything (if~-then ast) cur-func-name line-num)))
+                                                (let ((generated-then-expr (generate-everything (if~-then ast) cur-func-name line-num #t)))
                                                   (let ((line-num (+ line-num (length generated-then-expr))))
                                                     (let ((generated-then-expr (append generated-then-expr
                                                                                        (list (lambda (offset) 
                                                                                                (string-append (number->string line-num) (format ": JEQ 0,~a(7)\n" offset)))))))
                                                       (let ((length-then (length generated-then-expr)))
                                                         (let ((line-num (+ line-num 1)))
-                                                          (let ((generated-else-expr (generate-everything (if~-else ast) cur-func-name line-num)))
+                                                          (let ((generated-else-expr (generate-everything (if~-else ast) cur-func-name line-num #t)))
                                                             (let ((line-num (+ line-num (length generated-else-expr))))
                                                               (let ((length-else (length generated-else-expr)))
                                                                 (generate-if generated-test-expr 
@@ -146,32 +146,59 @@
                                                                   generated-actuals))))))
                     ((nonemptyactuals? ast)        (append (generate-everything (nonemptyactuals-expr ast) cur-func-name line-num)))
                     ((empty-actuals? ast)          (list))
-                    ((function-call? ast)        (let ((generated-actuals (generate-everything (function-call-actuals ast) cur-func-name (+ 4 line-num))))
-                                                   (let ((line-num-after-actuals (+ (+ 4 line-num) (length generated-actuals))))
-                                                     (append (append 
-                                                              (list (string-append (number->string line-num)       ":  ST 3,0(5) start of function call\n")
-                                                                    (string-append (number->string (+ 1 line-num)) ": ADD 5,4,5\n")
-                                                                    ;(string-append (number->string (+ 2 line-num)) ": ADD 3,0,5\n") moved down
-                                                                    (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n")
-                                                                    (string-append (number->string (+ 3 line-num)) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals))))
-                                                              generated-actuals)
-                                                             (list (string-append (number->string line-num-after-actuals) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals)))
-                                                                   (list (string-append (number->string (+ 1 line-num-after-actuals)) ": LDA 7,~a(0)\n")
-                                                                         (symbol-table-lookup (identifier-value (function-call-name ast))))
-                                                                   (string-append (number->string (+ 2 line-num-after-actuals)) ": ADD 3,0,5\n")
-                                                                   (string-append (number->string (+ 3 line-num-after-actuals)) ":  LD 3,-1(5)\n")
-                                                                   (string-append (number->string (+ 4 line-num-after-actuals)) ":  LD 1,0(5)\n")
-                                                                   (string-append (number->string (+ 5 line-num-after-actuals)) ":  ST 1,-1(5)\n")
-                                                                   (string-append (number->string (+ 6 line-num-after-actuals)) ":  ST 1,0(3)\n")
-                                                                   (string-append (number->string (+ 7 line-num-after-actuals))
-                                                                                  (format ":  LD 6,~a(3) end of function call\n" (+ 1 (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params))))
-                                                                   )))))
+                    ((function-call? ast)        (if (and tr? (equal? cur-func-name (identifier-value (function-call-name ast))))
+                                                     (let ((generated-actuals (generate-everything (function-call-actuals ast) cur-func-name  line-num)))
+                                                       (let ((line-num-after-actuals (+ line-num (length generated-actuals))))
+                                                         (append ;(list (string-append (number->string line-num) ":  ST 5,0(3) store 5 location out to 3, then generate actuals\n"))
+                                                                 generated-actuals
+;                                                                 (list (string-append (number->string line-num-after-actuals) ":  LD 5,0(3) set 5 back\n"))
+                                                                 (let ((load-actuals (load-actuals-as-args line-num-after-actuals
+                                                                                                           (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params)
+                                                                                                           0)))
+                                                                   (let ((line-num-after-actuals (+ line-num-after-actuals (length load-actuals))))
+                                                                     (append load-actuals
+                                                                             (list (string-append (number->string line-num-after-actuals) ": ADD 5,0,3\n")
+                                                                                   (string-append (number->string (+ 1 line-num-after-actuals)) (format ": LDC 1,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params))))
+                                                                                   ;note there could be a problem with above line 
+                                                                                   (string-append (number->string (+ 2 line-num-after-actuals)) ": ADD 5,1,5\n")
+                                                                                   (list (string-append (number->string (+ 3 line-num-after-actuals)) ": LDA 7,~a(0)\n")
+                                                                                         (symbol-table-lookup (identifier-value (function-call-name ast)))))))))))
+                                                     (let ((generated-actuals (generate-everything (function-call-actuals ast) cur-func-name (+ 4 line-num))))
+                                                       (let ((line-num-after-actuals (+ (+ 4 line-num) (length generated-actuals))))
+                                                         (append (append 
+                                                                  (list (string-append (number->string line-num)       ":  ST 3,0(5) start of function call\n")
+                                                                        (string-append (number->string (+ 1 line-num)) ": ADD 5,4,5\n")
+                                                                        ;(string-append (number->string (+ 2 line-num)) ": ADD 3,0,5\n") moved down
+                                                                        (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n")
+                                                                        (string-append (number->string (+ 3 line-num)) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals))))
+                                                                  generated-actuals)
+                                                                 (list (string-append (number->string line-num-after-actuals) (format ": LDC 6,~a(0)\n" (+ 2 line-num-after-actuals)))
+                                                                       (list (string-append (number->string (+ 1 line-num-after-actuals)) ": LDA 7,~a(0)\n")
+                                                                             (symbol-table-lookup (identifier-value (function-call-name ast))))
+                                                                       (string-append (number->string (+ 2 line-num-after-actuals)) ": ADD 3,0,5\n")
+                                                                       (string-append (number->string (+ 3 line-num-after-actuals)) ":  LD 3,-1(5)\n")
+                                                                       (string-append (number->string (+ 4 line-num-after-actuals)) ":  LD 1,0(5)\n")
+                                                                       (string-append (number->string (+ 5 line-num-after-actuals)) ":  ST 1,-1(5)\n")
+                                                                       ;(string-append (number->string (+ 6 line-num-after-actuals)) ":  ST 1,0(3)\n")
+                                                                       (string-append (number->string (+ 6 line-num-after-actuals))
+                                                                                      (format ":  LD 6,~a(3) end of function call\n" (+ 1 (hash-ref (hash-ref symbol-table cur-func-name) 'amt-of-params))))
+                                                                       ))))))
                     ;(else (list "NOTHING MATCHED IN generate FUNCTION" ast))
                     ))))
         (if (error-ast? ast)
             ast
             (printf (create-tm-string (generate-everything ast 1 0) symbol-table)))) )));check for parser error
 
+(define load-actuals-as-args
+  (lambda (line-num amt-of-actuals count);assumes count is zero. Should make helper but oh well
+    (if (equal? amt-of-actuals count)
+        '()
+        (append (list (string-append (number->string line-num) (format ":  LD 2,~a(5) ..loading actual\n" (- (+ 1 count))))
+                      (string-append (number->string (+ 1 line-num)) (format ":  ST 2,~a(3) ..storing actual\n" (- amt-of-actuals count))))
+                (load-actuals-as-args (+ 2 line-num) amt-of-actuals (+ 1 count))))))
+        
+    
+    
 (define generate-number
   (lambda (value top-of-call-stack line-num)
     (append (list (string-append (number->string line-num)       (format ": LDC 1,~a(0)\n" value))
@@ -409,7 +436,7 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-;(generate (semantic-analysis (parser "../test-programs/team-written/summationToN.kln")))
+;(generate (semantic-analysis (parser "summationToN.kln")))
 ;(parser "klein-programs/08-addition.kln")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
 
