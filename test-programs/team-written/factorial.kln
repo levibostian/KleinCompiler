@@ -2,10 +2,11 @@
 // Team: RackAttack
 // cs4550 - Fall 2013
 
-main (n : integer) : boolean
+main (n : integer) : integer
     factorial(n)
 
 factorial(n : integer) : integer
+    print( n )
     if n = 1 then
         1
     else

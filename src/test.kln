@@ -1,0 +1,7 @@
+main( m : integer, n : integer) : integer
+  print( m )
+  if n < m then
+  	12345
+  else
+  	main( m + 1, n )
+  endif
