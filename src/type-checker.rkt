@@ -422,7 +422,8 @@
                                         (check-for-type-errors-helper (function-call-actuals ast) cur-func)))
           ((nonemptyactuals? ast) (get-error-if-exists (get-type-of-exp ast) (list 'arg-error 'in 'function-call 'in cur-func)))
           ((nonemptyactuals-prime? ast) (append (check-for-type-errors-helper (nonemptyactuals-prime-expr ast) cur-func)
-                                                (check-for-type-errors-helper (nonemptyactuals-prime-nonemptyactuals ast) cur-func))) )))
+                                                (check-for-type-errors-helper (nonemptyactuals-prime-nonemptyactuals ast) cur-func)))
+          ((empty-actuals? ast) no-type-err))))
 
 
 
