@@ -1,0 +1,14 @@
+ $ ./kleinc ../test-programs/class-downloaded/euclid.kln /tmp/euclid.tm
+ $ tm /tmp/euclid.tm 100 15
+TM  simulation (enter h for help)...
+Enter command: g
+OUT instruction prints: 5
+HALT: 0,0,0
+
+Execution took 0 clicks.
+Halted
+Enter command: r
+0:    0    1:    5    2:    0    3:    0    
+4:    1    5:    0    6:    4    7:    7    
+Enter command: q
+Simulation done.

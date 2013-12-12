@@ -409,7 +409,7 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-(generate (semantic-analysis (parser "../test-programs/team-written/summationToN.kln")))
+;(generate (semantic-analysis (parser "../test-programs/team-written/summationToN.kln")))
 ;(parser "klein-programs/08-addition.kln")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
 
