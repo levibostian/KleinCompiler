@@ -1,11 +1,12 @@
-#!/bin/bash
 
-if [ $# -ne 1 ] 
+
+if [ $# -ne 2 ] 
 then
-    echo "Useage: kleinc <path-to-klein-source>"
+    echo "Useage: kleinc <path-to-klein-source> <path-to-tm-output>"
     exit 1
 fi
 
-FIL_NAME=$(echo $1 | cut -d'.' --complement -f2-)
+#FIL_NAME=$(echo $1 | cut -d'.' --complement -f2-)
 
-racket bash-files/run-code-generator.rkt $1 $FIL_NAME.tm
+racket bash-files/run-code-generator.rkt $1 $2
+
