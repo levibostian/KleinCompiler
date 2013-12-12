@@ -13,9 +13,12 @@
    none.
    
 ///List of known bugs:
-   none.
+   1. If Klein source file contains multiple main() functions, 
+      the compiler compiles code successfully but only using 
+      the last occurrence of main() found.
 
 ///Description of optimizations implemented:
+   none.
 
 ///Compiler Execution:
 ***Must have racket language installed to execute parser.
