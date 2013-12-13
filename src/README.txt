@@ -36,11 +36,13 @@
 ///Compiler Execution:
 ***Must have racket language installed to execute parser.
    And path-to-racket/bin/racket must also be located in $PATH variable.
-$ kleinc <path-to-klein-source> <path-to-tm-output>
+$ ./kleinc <path-to-klein-source> <path-to-tm-output>
 If no output is shown, compilation completed successfully. 
+**If input or output file is not found, bash error will be produced, not Klein compiler
+error.**
 
 To run generated tm code:
-$ tm <path-to-tm-source> <optional-main-arguments>
+$ ./tm <path-to-tm-source> <optional-main-arguments>
 
 <path-to-racket/bin/racket> is path on your machine where racket language is
    installed. 

@@ -20,7 +20,6 @@
 ;
 ;
 
-
 (provide (all-defined-out))
 (require "type-checker.rkt"
          "parser.rkt"
@@ -41,13 +40,13 @@
                           (string-append (number->string (+ 1 line-num)) (format ": LDC 5,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table 'main) 'amt-of-params))))
                           (string-append (number->string (+ 2 line-num)) ": LDC 4,1(0)\n")
                           (list (string-append (number->string (+ 3 line-num)) ": LDA 7,~a(0)\n")
-                                (symbol-table-lookup 'main)) ; note this for future reference for functions
+                                (symbol-table-lookup 'main))
                           (string-append (number->string (+ 4 line-num)) ":  LD 1,0(3)\n")
                           (string-append (number->string (+ 5 line-num)) ": OUT 1,0,0\n" )
                           (string-append (number->string (+ 6 line-num)) ":HALT 0,0,0\n" ) ))))))
 
-(define generate ; make sure to check for errors from AST
-  (lambda (ast)  ; find way to keep track of top of call stack
+(define generate 
+  (lambda (ast) 
     (let ((symbol-table (symbol-table ast)))
       (letrec ((generate-everything
                 (lambda (ast cur-func-name line-num [tr? #f])
@@ -65,7 +64,7 @@
                                                                                    (+ 5 line-num))))
                                           (let ((line-num-after-body (+ (+ 5 line-num) (length generated-body))))          
                                             (hash-set! (hash-ref symbol-table (identifier-value (def-id ast))) 'tm-line line-num)
-                                            (append (list (string-append "* " (symbol->string (identifier-value (def-id ast))) "\n")) ; add def to symbol table, branch number
+                                            (append (list (string-append "* " (symbol->string (identifier-value (def-id ast))) "\n")) 
                                                     (list (string-append (number->string line-num)       ": ADD 3,5,0\n"))
                                                     (list (string-append (number->string (+ 1 line-num)) (format ": LDC 1,~a(0)\n" (+ 1 (hash-ref (hash-ref symbol-table (identifier-value (def-id ast))) 'amt-of-params)))))
                                                     (list (string-append (number->string (+ 2 line-num)) ": SUB 3,3,1\n"))
@@ -75,7 +74,7 @@
                                                     (list (string-append (number->string line-num-after-body) ":  ST 1,0(3)\n"))
                                                     (list (string-append (number->string (+ 1 line-num-after-body)) ": ADD 5,3,0\n"))
                                                     ;(list (string-append (number->string (+ 2 line-num-after-body)) (format ":  LD 6,~a(3)\n" (+ 1 (hash-ref (hash-ref symbol-table (identifier-value (def-id ast))) 'amt-of-params)))))
-                                                    (list (string-append (number->string (+ 2 line-num-after-body)) ": LDA 7,0(6)\n")))))) ; use the let implementation to find out length of whole function
+                                                    (list (string-append (number->string (+ 2 line-num-after-body)) ": LDA 7,0(6)\n")))))) 
                     ((print-body? ast)  (let ((generated-print-expr (generate-everything (print-body-print-expr ast) cur-func-name line-num)))
                                           (let ((line-num-after-print-expr (+ line-num (length generated-print-expr))))
                                             (let ((generated-print (generate-print generated-print-expr line-num-after-print-expr cur-func-name)))
@@ -414,17 +413,6 @@
            (string-append (number->string (+ 1 line-num)) ":  ST 1,0(5)\n")
            (string-append (number->string (+ 2 line-num)) ": ADD 5,4,5\n") ))))
 
-;(define generate-func-call
-;  (lambda (func-call line-num symbol-table)
-;    (append 
-;     (list (string-append (number->string line-num)       ":  ST 3,0(5)\n")
-;           (string-append (number->string (+ 1 line-num)) ": ADD 5,4,5\n")
-;           (string-append (number->string (+ 2 line-num)) ": ADD 3,0,5\n")
-;           (string-append (number->string (+ 3 line-num)) ": ADD 5,4,5\n")
-;           (generate-actuals (function-call-actuals func-call))
-;           (string-append (number->string (+ 
-
-  
 (define generate-actuals
   (lambda (actuals)
     (append 
@@ -454,13 +442,8 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-;(generate (semantic-analysis (parser "test.kln")))
+(generate (semantic-analysis (parser "test.kln")))
 ;(parser "klein-programs/08-addition.kln")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
+;(generate (semantic-analysis (parser "../test-programs/team-written/factorial.kln")))
 
-
-
-
-
-  
-  

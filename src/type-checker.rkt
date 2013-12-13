@@ -420,7 +420,7 @@
                                          (check-for-type-errors-helper (and~-left ast) cur-func)
                                          (check-for-type-errors-helper (and~-right ast) cur-func)))
           ((negative-value? ast) (append (get-error-if-exists (get-type-of-exp ast) (list 'negate-expression 'of (negative-value-value ast) 'in cur-func 'must 'be 'integer))
-                                         (check-for-type-errors-helper (not-value ast) cur-func)))
+                                         (check-for-type-errors-helper (negative-value-value ast) cur-func)))
           ((if~? ast)            (append (check-for-type-errors-helper (if~-test ast) cur-func)
                                          (check-for-type-errors-helper (if~-then ast) cur-func)
                                          (check-for-type-errors-helper (if~-else ast) cur-func)))
