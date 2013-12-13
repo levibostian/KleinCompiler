@@ -1,0 +1,15 @@
+subtractFromLarger(firstNumber: integer, secondNumber: integer): integer
+  if firstNumber < secondNumber then
+    secondNumber - firstNumber
+  else
+    firstNumber - secondNumber
+  endif
+
+divideNumber(number: integer): integer
+  number / 2
+
+divideAndAddNumbers(firstNumber: integer, secondNumber: integer): integer
+  divideNumber(firstNumber) + divideNumber(secondNumber)
+
+main(firstNumber: integer, secondNumber: integer): boolean
+  subtractFromLarger(firstNumber, secondNumber) < divideAndAddNumbers(firstNumber, secondNumber)

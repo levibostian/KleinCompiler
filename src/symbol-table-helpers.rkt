@@ -30,7 +30,9 @@
 
 (define get-formal-by-pos
   (lambda (function sym-table position error-type)
-    (hash-ref (hash-ref (hash-ref sym-table function) 'parameters) position error-type)))
+    (if (eq? 'unbound (hash-ref sym-table function 'unbound))
+        'TYPE-ERROR
+        (hash-ref (hash-ref (hash-ref sym-table function) 'parameters) position error-type))))
 
 (define get-function-type
   (lambda (function sym-table error-type)
@@ -47,4 +49,8 @@
     (if (member? 'print (hash-keys sym-table))
         #f
         #t)))
- 
+(define does-main-not-exist?
+  (lambda (sym-table)
+    (if (member? 'main (hash-keys sym-table))
+        #f
+        #t)))

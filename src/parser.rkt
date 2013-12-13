@@ -62,7 +62,7 @@
   (lambda (parser-accum top-of-stack stack current-token token-list semantic-stack previous-terminal)
     (let ((grammar-rule (rule-for top-of-stack (terminal-for current-token))))
       (if (transition-error? grammar-rule) 
-          (print-error (get-current-token token-list) grammar-rule)
+          (print-transition-error (get-current-token token-list) grammar-rule)
           (token-reader-helper (gather-parser-output parser-accum top-of-stack current-token)
                                (check-for-push (pop stack) grammar-rule)
                                token-list

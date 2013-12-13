@@ -195,7 +195,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;Actuals;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-struct empty-actuals ())
-(define make/empty-actuals (semantic-no-pops make-empty-actuals))
+(define make/empty-actuals
+  (lambda (stack value)
+    (push stack (list (make-empty-actuals)))))
 
 (define-struct nonemptyactuals (expr type))
 (define make/nonemptyactuals (semantic-action-1 make-nonemptyactuals))

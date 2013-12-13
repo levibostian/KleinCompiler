@@ -1,0 +1,33 @@
+//
+// FILE:	digitsum.kln
+// AUTHOR:	Anthony Spoerl
+// DATE:	9/22/13
+// TASK:	prints the sum of all digits of integer n
+//
+
+main( n : integer ) : integer
+	print(sumOfDigits( n )) 
+
+sumOfDigits( n : integer ) integer
+	sumOfDigitsRec(n, 0)
+
+sumOfDigitsRec( n : integer, total : integer ) integer
+	if n / 10 = 0 then
+		total + n
+	else
+		sumOfDigitsRec( stripFirstDigit(n), total + getFirstDigit(n) )
+	endif
+
+stripFirstDigit( n : integer ) integer
+	n / 10
+	
+getFirstDigit( n : integer ) integer
+	modulus(n,10)
+
+modulus( n : integer, dividend : integer ) : integer
+	n - intDivisionDifference(n,dividend)
+	
+// Created to force precedence
+intDivisionDifference( n : integer, dividend : integer ) : integer
+	// Int division will truncate, multiplying by dividend will cause a difference in the remainder
+	num / dividend * dividend

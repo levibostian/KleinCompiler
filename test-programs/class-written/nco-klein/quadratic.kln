@@ -1,0 +1,77 @@
+// Author: Jordan Greiner
+// File: quadratic.kln
+// Date: November 07, 2013
+// Comments: Program to calculate the quadratic formula
+//           given 3 numbers and outputs x-intercepts.
+
+main( a : integer, b : integer, c : integer ) : boolean
+  print( quadPlus(a, NEG(b), c ) )
+  printAndReturn( quadMinus(a, NEG(b), c ) )
+
+quadPlus( a : integer, bee : integer, c : integer ) : integer
+  quadHelp(a, bee, SQRT( SQUARE(bee) - TIMES(4, TIMES(a, c)) ) )
+  
+quadMinus( a : integer, bee : integer, c : integer ) : integer
+  quadHelp(a, bee, NEG(SQRT( SQUARE(bee) - TIMES(4, TIMES(a, c)) )) )
+
+quadHelp( a : integer, bee : integer, result : integer) : integer
+  DIV(PLUS( bee, result ), TIMES(2, a))
+   
+SQUARE( x : integer ) : integer
+  x * x
+ 
+  
+// ----------------------------------------------
+// Taken from Dr. W.
+// ----------------------------------------------
+
+printAndReturn( bool : boolean ) : boolean
+  print( bool )
+  bool
+
+// ----------------------------------------------
+// Taken from lib.kln
+// ----------------------------------------------
+
+LT( p : integer, q : integer ) : boolean
+    p < q
+
+EQ( p : integer, q : integer ) : boolean
+    p = q
+
+LE( p : integer, q : integer ) : boolean
+    LT(p, q) or EQ(p, q)
+
+PLUS( p : integer, q : integer ) : integer
+    p + q
+	
+TIMES( p : integer, q : integer ) : integer
+    p * q
+	
+DIV( p : integer, q : integer ) : integer
+    p / q
+
+NEG( i : integer ) : integer
+    0 - i
+	
+SQRT( n : integer ) : integer
+    SQRTSEARCH( n, 0, n )
+
+SQRTSEARCH( n : integer, low : integer, high : integer ) : integer
+    if LE( high, low + 1 ) then
+        if LE( n - TIMES(low,low), TIMES(high,high) - n ) then
+            low
+        else
+            high
+        endif
+    else
+        SQRTSPLIT( n, low, high, PLUS(low, high)/2 )
+    endif
+
+SQRTSPLIT( n : integer,
+           low : integer, high : integer, mid : integer ) : integer
+    if LE( mid*mid, n ) then
+        SQRTSEARCH( n, mid, high )
+    else
+        SQRTSEARCH( n, low, mid )
+    endif

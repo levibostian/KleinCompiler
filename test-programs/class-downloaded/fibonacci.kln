@@ -15,10 +15,10 @@ addNext(currentElement : integer,
         previousSum    : integer,
         currentSum     : integer  ) : integer 
 
-if elementWanted = currentNumber then
+if elementWanted = currentElement then
    currentSum
 else
-   addNext( currentNumber + 1,
+   addNext( currentElement + 1,
             elementWanted,
             currentSum,
             previousSum + currentSum )
