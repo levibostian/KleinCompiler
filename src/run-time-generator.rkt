@@ -440,10 +440,3 @@
     (with-output-to-file tm-file-name
       (lambda () (generate (semantic-analysis (parser file-name))))
       #:exists 'replace)))
-
-;(write-out "klein-programs/08-print.kln" "08-print.tm")
-(generate (semantic-analysis (parser "test.kln")))
-;(parser "klein-programs/08-addition.kln")
-;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
-;(generate (semantic-analysis (parser "../test-programs/team-written/factorial.kln")))
-
