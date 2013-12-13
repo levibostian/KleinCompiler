@@ -8,7 +8,7 @@
 *                           Levi Bostian                      *
 *                           Kyle Mueller                      *
 * ------------------------------------------------------------*
-   
+
 ///Klein language features not implemented in compiler:
    none.
    
@@ -18,7 +18,20 @@
       the last occurrence of main() found.
 
 ///Description of optimizations implemented:
-   none.
+   Tail Recursion is implemented!
+
+///Notes:
+   -There is a lot of TM generated that may be useless. 
+   -We were able to run a lot of programs, including Circular-prime.kln
+   -Didn't have to increase TM memory to run any of the kln programs
+   -We decided to use Register 5 to keep track of the top of DM
+   -Register 3 keeps track of bottom of current call frame, seemed easy
+   -We didn't use 3-address code. Just generated it from AST
+   -Templated out each expression, thus extra TM code
+   Otherwise, not much changed from our design documented in the last 
+   submission. We used these registers to get around with offsets. 
+   The generated TM code is long but it does the job and was easy
+   to understand. 
 
 ///Compiler Execution:
 ***Must have racket language installed to execute parser.

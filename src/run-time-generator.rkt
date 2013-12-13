@@ -1,7 +1,25 @@
 #lang racket
 
-;it ain't pretty, but it works :)
-;(Could be cleaned up very easily just didn't have time)
+;
+;
+;If you would like to run this straight from Racket, here is how to do so:
+;
+;
+;
+; This will generate the TM code for circular-prime.kln
+; 
+;(generate (semantic-analysis (parser "../test-programs/class-downloaded/circular-prime.kln")))
+;
+; Copy and paste that into a .tm file and you can run it!
+;
+;
+;
+;
+;
+;
+;
+;
+
 
 (provide (all-defined-out))
 (require "type-checker.rkt"
@@ -436,7 +454,7 @@
       #:exists 'replace)))
 
 ;(write-out "klein-programs/08-print.kln" "08-print.tm")
-;(generate (semantic-analysis (parser "summationToN.kln")))
+;(generate (semantic-analysis (parser "test.kln")))
 ;(parser "klein-programs/08-addition.kln")
 ;(generate (semantic-analysis (parser "klein-programs/08-addition.kln")))
 

@@ -326,7 +326,9 @@
         ;(display-errors function-type
         ;                (list 'function 'call 'in current-function 'does 'not 'exist))
         (make-function-call (function-call-name f-c)
-                            (checks-type-by-formal-pos (function-call-actuals f-c) (identifier-value function-name) current-function 0 symbol-table type-err)
+                            (if (equal? (check-how-many-actuals (function-call-actuals f-c) 0) (hash-ref (hash-ref symbol-table (identifier-value function-name)) 'amt-of-params))
+                                (checks-type-by-formal-pos (function-call-actuals f-c) (identifier-value function-name) current-function 0 symbol-table type-err)
+                                (make-nonemptyactuals 'default-value type-err))
                             (get-function-type (identifier-value function-name) symbol-table type-err) )))))
 
 (define checks-type-by-formal-pos
@@ -358,6 +360,14 @@
                                         (if (eq? (get-type-of-exp type-checked-expr) looked-up-type)
                                             looked-up-type
                                             error-type)))))))
+(define check-how-many-actuals
+  (lambda (actuals accum)
+    (cond ((nonemptyactuals? actuals) (+ accum 1))
+          ((nonemptyactuals-prime? actuals) (+ (check-how-many-actuals (nonemptyactuals-prime-expr actuals) accum)
+                                               (check-how-many-actuals (nonemptyactuals-prime-nonemptyactuals actuals)
+                                                                       accum)))
+          ((empty-actuals? actuals) 0)
+          (else (+ 1 accum)))))
 
 (define type-err?
   (lambda (type)
@@ -422,8 +432,7 @@
                                         (check-for-type-errors-helper (function-call-actuals ast) cur-func)))
           ((nonemptyactuals? ast) (get-error-if-exists (get-type-of-exp ast) (list 'arg-error 'in 'function-call 'in cur-func)))
           ((nonemptyactuals-prime? ast) (append (check-for-type-errors-helper (nonemptyactuals-prime-expr ast) cur-func)
-                                                (check-for-type-errors-helper (nonemptyactuals-prime-nonemptyactuals ast) cur-func)))
-          ((empty-actuals? ast) no-type-err))))
+                                                (check-for-type-errors-helper (nonemptyactuals-prime-nonemptyactuals ast) cur-func))))))
 
 
 
