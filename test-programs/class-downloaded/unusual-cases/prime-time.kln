@@ -1,0 +1,32 @@
+// -------------------------------
+// test: print boolean
+// -------------------------------
+
+main(n:integer):boolean
+   isPrime(n)
+
+// -------------------------------
+// I borrowed these functions from
+// test library program sieve.kln
+// -------------------------------
+
+isPrime( n : integer ) : boolean
+   not hasDivisorFrom(2, n)
+
+hasDivisorFrom( i : integer, n : integer) : boolean
+   if i < n then
+      divides(i, n) or hasDivisorFrom(i+1, n)
+   else
+      false
+   endif
+
+divides( a : integer, b : integer) : boolean
+   rem(b, a) = 0
+
+rem( num : integer, den : integer) : integer
+   if num < den then
+      num
+   else
+      rem( num-den, den)
+   endif
+

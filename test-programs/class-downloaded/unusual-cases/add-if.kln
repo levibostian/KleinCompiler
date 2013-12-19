@@ -1,0 +1,12 @@
+// -------------------------------
+// test: if expression as a value
+// -------------------------------
+
+main(n : integer) : integer
+  6 + if n < 0
+      then
+         10
+      else
+         n*n
+      endif
+

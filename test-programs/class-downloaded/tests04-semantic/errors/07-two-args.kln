@@ -1,0 +1,6 @@
+main(n : integer) : integer
+  f(n+1,false)
+
+f(m : integer, n : integer) : integer
+  2 * m + n
+

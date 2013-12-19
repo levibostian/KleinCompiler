@@ -1,0 +1,5 @@
+main(n:integer):integer
+  m
+
+f(m:integer):boolean
+  m+n

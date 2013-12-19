@@ -21,7 +21,7 @@ df( x : integer ) : integer
 
 newtonAux( guess   : integer, previous : integer,
            epsilon : integer, n        : integer ) : integer
-  if epsilon < ABS(previous-guess) then
+  if epsilon < abs(previous-guess) then
     newtonAux( guess - f(guess,n)/df(guess), guess, epsilon, n )
   else
     guess

@@ -1,0 +1,5 @@
+main():integer
+  1
+
+print():boolean
+  true

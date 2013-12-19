@@ -1,0 +1,6 @@
+main(n : integer) : integer
+  inc(n) or inc(n+1)
+
+inc(n : integer) : integer
+  2 * n
+

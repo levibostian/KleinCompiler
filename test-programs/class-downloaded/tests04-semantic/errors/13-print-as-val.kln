@@ -1,0 +1,6 @@
+main():integer
+  if true then
+     print(1)
+  else
+     6
+  endif

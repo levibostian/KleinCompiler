@@ -1,0 +1,11 @@
+// -------------------------------
+// test: recursive main function
+// -------------------------------
+
+main(n : integer) : integer
+  print(n)
+  if n < 0
+     then 0
+     else main(n-1)
+  endif
+

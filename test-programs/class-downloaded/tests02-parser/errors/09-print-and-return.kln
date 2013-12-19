@@ -1,0 +1,4 @@
+main() : integer
+  true
+  print(1)
+

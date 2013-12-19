@@ -1,0 +1,9 @@
+main(n : integer) : integer
+  f(n+1,n<1)
+
+f(m : integer, n : boolean) : integer
+  if n then
+    2 * m + n
+  else
+    2
+  endif
